@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>969</width>
+    <height>646</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Open Chrono-Morph Viewer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>ui/graphics/icon_window.ico</normaloff>ui/graphics/icon_window.ico</iconset>
+  </property>
+  <widget class="QWidget" name="central_widget">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="h_splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QFrame" name="controls_panel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>280</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QListWidget" name="scene_list">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>3</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::InternalMove</enum>
+          </property>
+          <property name="movement">
+           <enum>QListView::Free</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollArea" name="scene_scroller">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>4</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+          <widget class="QWidget" name="scene_settings">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>254</width>
+             <height>270</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame_vtk">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="timeline_layout_1">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>70</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="timeline_layout_2">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="leftMargin">
+          <number>10</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="button_play">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>28</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Automatic timeline advancement</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>ui/graphics/button_play.png</normaloff>
+             <normalon>ui/graphics/button_pause.png</normalon>ui/graphics/button_play.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_prev">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>28</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Back one sequence (Page Up)</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>ui/graphics/button_previous.png</normaloff>ui/graphics/button_previous.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_next">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>20</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>28</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Forward one sequence (Page Down)</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>ui/graphics/button_next.png</normaloff>ui/graphics/button_next.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>28</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_n_cycles">
+           <property name="text">
+            <string>Cycles:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="edit_n_cycles">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>30</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>1</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_fps">
+           <property name="toolTip">
+            <string>The maximum rate to play volumes</string>
+           </property>
+           <property name="text">
+            <string>Max FPS:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="edit_fps">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Volume rate (volumes/sec)</string>
+           </property>
+           <property name="inputMask">
+            <string>99.99</string>
+           </property>
+           <property name="text">
+            <string>20.00</string>
+           </property>
+           <property name="maxLength">
+            <number>5</number>
+           </property>
+           <property name="frame">
+            <bool>true</bool>
+           </property>
+           <property name="cursorPosition">
+            <number>0</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_goto_time">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Jump to the index specified</string>
+           </property>
+           <property name="text">
+            <string>Go to</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="edit_goto_time">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>This is the index to jump to when &quot;go to&quot; is pressed</string>
+           </property>
+           <property name="inputMask">
+            <string/>
+           </property>
+           <property name="text">
+            <string>1</string>
+           </property>
+           <property name="maxLength">
+            <number>32767</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_cache">
+           <property name="text">
+            <string>Cache:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="edit_cache_limit">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0.0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_cache_unit">
+           <property name="text">
+            <string>GB</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_timepoint">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Timeline info</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QSlider" name="slider_timeline">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>The timeline is for choosing which volume to view</string>
+         </property>
+         <property name="tracking">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksAbove</enum>
+         </property>
+         <property name="tickInterval">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>969</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_file">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="action_open"/>
+    <addaction name="separator"/>
+    <addaction name="action_save_scene"/>
+    <addaction name="action_save_scene_as"/>
+    <addaction name="action_save_keyframe"/>
+    <addaction name="action_load_scene"/>
+    <addaction name="separator"/>
+    <addaction name="action_increase_phase"/>
+    <addaction name="action_decrease_phase"/>
+   </widget>
+   <widget class="QMenu" name="menu_render">
+    <property name="title">
+     <string>Render</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="action_screenshot"/>
+    <addaction name="action_render_settings"/>
+   </widget>
+   <widget class="QMenu" name="menu_viewer">
+    <property name="title">
+     <string>Timeline</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="action_play_pause"/>
+    <addaction name="action_next_volume"/>
+    <addaction name="action_prev_volume"/>
+    <addaction name="action_next_sequence"/>
+    <addaction name="action_prev_sequence"/>
+    <addaction name="action_start_of_sequence"/>
+    <addaction name="action_end_of_sequence"/>
+   </widget>
+   <widget class="QMenu" name="menu_about">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="action_manual"/>
+    <addaction name="action_acknowledgements"/>
+    <addaction name="action_version"/>
+   </widget>
+   <widget class="QMenu" name="menu_scene">
+    <property name="title">
+     <string>Scene</string>
+    </property>
+    <addaction name="action_delete_item"/>
+    <addaction name="action_deselect_item"/>
+    <addaction name="action_toggle_item"/>
+    <addaction name="separator"/>
+    <addaction name="action_look_at_plane"/>
+    <addaction name="action_plane_to_view"/>
+    <addaction name="separator"/>
+    <addaction name="action_place_control_point"/>
+   </widget>
+   <addaction name="menu_file"/>
+   <addaction name="menu_viewer"/>
+   <addaction name="menu_scene"/>
+   <addaction name="menu_render"/>
+   <addaction name="menu_about"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_open">
+   <property name="text">
+    <string>Open Volumes...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load a set of NRRD files</string>
+   </property>
+  </action>
+  <action name="action_save_scene">
+   <property name="text">
+    <string>Save Scene...</string>
+   </property>
+   <property name="toolTip">
+    <string>Write all settings and visual elements to a file</string>
+   </property>
+  </action>
+  <action name="action_load_scene">
+   <property name="text">
+    <string>Load Scene...</string>
+   </property>
+   <property name="toolTip">
+    <string>Update the visual elements and settings from a file</string>
+   </property>
+  </action>
+  <action name="action_screenshot">
+   <property name="text">
+    <string>To Image...</string>
+   </property>
+  </action>
+  <action name="action_render_settings">
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+   <property name="iconText">
+    <string>Not implemented</string>
+   </property>
+  </action>
+  <action name="action_print_item">
+   <property name="text">
+    <string>Print Item</string>
+   </property>
+  </action>
+  <action name="action_toggle_item">
+   <property name="text">
+    <string>Toggle Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Check/uncheck the active scene item</string>
+   </property>
+  </action>
+  <action name="action_look_at_plane">
+   <property name="text">
+    <string>Look at Plane</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the camera so it is normal to the active plane</string>
+   </property>
+  </action>
+  <action name="action_plane_to_view">
+   <property name="text">
+    <string>Plane to View</string>
+   </property>
+   <property name="toolTip">
+    <string>Turn the active plane so it is normal to the camera</string>
+   </property>
+  </action>
+  <action name="action_play_pause">
+   <property name="text">
+    <string>Play/Pause</string>
+   </property>
+   <property name="toolTip">
+    <string>Autoplay volumes</string>
+   </property>
+  </action>
+  <action name="action_next_volume">
+   <property name="text">
+    <string>Next Volume</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the timeline slider right by one step</string>
+   </property>
+  </action>
+  <action name="action_prev_volume">
+   <property name="text">
+    <string>Prev. Volume</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the timeline slider left by one step</string>
+   </property>
+  </action>
+  <action name="action_increase_phase">
+   <property name="text">
+    <string>Increase Phase</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust which volume in the sequence goes first</string>
+   </property>
+  </action>
+  <action name="action_decrease_phase">
+   <property name="text">
+    <string>Decrease Phase</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust which volume in the sequence goes first</string>
+   </property>
+  </action>
+  <action name="action_save_keyframe">
+   <property name="text">
+    <string>Save Keyframe</string>
+   </property>
+   <property name="toolTip">
+    <string>Like &quot;Save Scene&quot;, but automatically names the file</string>
+   </property>
+  </action>
+  <action name="action_next_sequence">
+   <property name="text">
+    <string>Next Sequence</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the next sequence</string>
+   </property>
+  </action>
+  <action name="action_prev_sequence">
+   <property name="text">
+    <string>Prev. Sequence</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the previous sequence</string>
+   </property>
+  </action>
+  <action name="action_manual">
+   <property name="text">
+    <string>Manual...</string>
+   </property>
+  </action>
+  <action name="action_acknowledgements">
+   <property name="text">
+    <string>Acknowledgements...</string>
+   </property>
+  </action>
+  <action name="action_version">
+   <property name="text">
+    <string>Version...</string>
+   </property>
+  </action>
+  <action name="action_deselect_item">
+   <property name="text">
+    <string>Deselect Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide the current item controller by deselecting it</string>
+   </property>
+  </action>
+  <action name="action_save_scene_as">
+   <property name="text">
+    <string>Save Scene As...</string>
+   </property>
+  </action>
+  <action name="action_start_of_sequence">
+   <property name="text">
+    <string>Start of Sequence</string>
+   </property>
+  </action>
+  <action name="action_end_of_sequence">
+   <property name="text">
+    <string>End of Sequence</string>
+   </property>
+  </action>
+  <action name="action_place_control_point">
+   <property name="text">
+    <string>Place Control Point</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new control point underneath the cursor position</string>
+   </property>
+  </action>
+  <action name="action_delete_item">
+   <property name="text">
+    <string>Delete Item</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
