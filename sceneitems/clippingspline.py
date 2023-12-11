@@ -218,7 +218,7 @@ class ClippingSpline(SceneItem):
             self.mask.set_volume(volume)
 
         if self.checked and self.initialized:
-            assert self.mask.has_volume, "Initialized without a volume somehow."
+            assert self.mask.has_volume(), "Initialized without a volume somehow."
             # The volume exists when the VolumeUpdater triggers this method.
             # In that case, it will handle rendering for us.
             return self.mask_updater.queue(do_render)
@@ -239,8 +239,10 @@ class ClippingSpline(SceneItem):
         points exist to form a plane.
         """
 
+        # TODO: Initialization is now meaningless.
+
         # Can only decide how to allocate resources if volumes exist.
-        if not self.mask.has_volume:
+        if not self.mask.has_volume():
             self.error_reporter.illegal_action("The mask can only be initialized when a volume is present.")
             return
 
@@ -250,7 +252,6 @@ class ClippingSpline(SceneItem):
         for i in range(max(0, 3 - self.mask.count_cp())):
             self.add_ctrl_pt()
 
-        self.mask.initialize(self.timeline)
         self.initialized = True
         self.update_view()
         self.attach_mask()
@@ -258,8 +259,10 @@ class ClippingSpline(SceneItem):
     def _uninitialize_mask(self) -> None:
         """Uninitialize the VolumeMaskTPS object."""
 
+        # TODO: Is there ever a reason to do this? It's meaningless now.
+
         logger.info("Uninitializing.")
-        self.mask.uninitialize()
+        self.mask.free()
         self.initialized = False
         self.update_view()
         self.attach_mask()
@@ -302,7 +305,7 @@ class ClippingSpline(SceneItem):
 
         if self.initialized and not initialized:
             self._uninitialize_mask()
-        elif not self.initialized and initialized and self.mask.has_volume:
+        elif not self.initialized and initialized and self.mask.has_volume():
             # I think it's appropriate here to silently ignore the error when initialization is impossible.
             self.initialize_mask()
         else:
