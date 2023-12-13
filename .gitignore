@@ -78,4 +78,5 @@ cython_debug/
 
 # Project-specific for the Open Chrono-Morph Viewer
 logs/
+ui/*.py
 ui/graphics/unused/
