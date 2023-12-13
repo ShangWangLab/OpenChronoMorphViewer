@@ -319,19 +319,6 @@ class VolumeMaskTPS:
                 self.v_offset = v_offset
                 self.v_scale = v_scale
 
-    def free(self) -> None:
-        """Free the memory associated with the mask, etc."""
-
-        with self.get_vtk_lock:
-            with self.lock:
-                logger.info(f"Uninitializing...")
-                self.parameters = None
-                self.dep_indices = None
-                self.mask = None
-                self.vtk_data = None
-                self._reduce_progress(MaskUpdate.FULL)
-                logger.info(f"Uninitialized.")
-
     # The constant NxN number of vertices to construct a mesh out of.
     N_MESH: int = 16
 

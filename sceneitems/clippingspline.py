@@ -59,7 +59,6 @@ class ClippingSpline(SceneItem):
         self.view_frame = view_frame
         self.timeline = timeline
         self.camera = camera
-        self.initialized: bool = False
         self.mask: VolumeMaskTPS = VolumeMaskTPS()
         self.mask_updater: MaskUpdater = MaskUpdater(self.mask, view_frame)
         self.bounds: Optional[ImageBounds] = None
@@ -83,10 +82,6 @@ class ClippingSpline(SceneItem):
         self.ui_settings.select_variable.setCurrentIndex(
             2 * self.mask.axis + int(self.mask.keep_greater_than)
         )
-        if self.initialized:
-            self.ui_settings.button_initialize.setText("Uninitialize")
-        else:
-            self.ui_settings.button_initialize.setText("Initialize")
         self.ui_settings.edit_regularization.setText(
             nice_exp_format(f"{self.mask.regularization:.4g}")
         )
@@ -98,6 +93,11 @@ class ClippingSpline(SceneItem):
         """Check the checkbox state and decide whether to show or hide."""
 
         super().update_visibility(view_frame)
+
+        if self.checked:
+            # Make sure there are at least 3 control points.
+            for i in range(max(0, 3 - self.mask.count_cp())):
+                self.add_ctrl_pt()
         self.attach_mask()
 
     def bind_event_listeners(self, view_frame: ViewFrame) -> None:
@@ -112,17 +112,9 @@ class ClippingSpline(SceneItem):
             logger.info(f"Axis: {self.mask.axis}, GT: {self.mask.keep_greater_than}")
             self.update_view()
             self.attach_mask()
-
         self.ui_settings.select_variable.currentIndexChanged.connect(
             change_variable
         )
-
-        def toggle_initialization() -> None:
-            if self.initialized:
-                self._uninitialize_mask()
-            else:
-                self.initialize_mask()
-        self.ui_settings.button_initialize.clicked.connect(toggle_initialization)
 
         def change_regularization() -> None:
             self.mask.set_regularization(validate_float(
@@ -131,7 +123,6 @@ class ClippingSpline(SceneItem):
             ))
             self.update_view()
             self.attach_mask()
-
         self.regularization_filter = EditDoneEventFilter(change_regularization)
         self.ui_settings.edit_regularization.installEventFilter(
             self.regularization_filter
@@ -190,9 +181,9 @@ class ClippingSpline(SceneItem):
     def delete_ctrl_pt(self, point: ControlPoint) -> None:
         """Remove the passed control point from the list and the scene view."""
 
-        if self.mask.count_cp() <= 3 and self.initialized:
-            # An active spline can't have fewer than 3 control points.
-            self._uninitialize_mask()
+        # An active spline can't have fewer than 3 control points.
+        if self.mask.count_cp() <= 3 and self.checked:
+            self.list_widget.setCheckState(Qt.Unchecked)  # type: ignore
 
         point.remove_from_scene_list(self.scene_list)
         self.mask.delete_cp(point)
@@ -217,55 +208,16 @@ class ClippingSpline(SceneItem):
         if volume is not None:
             self.mask.set_volume(volume)
 
-        if self.checked and self.initialized:
-            assert self.mask.has_volume(), "Initialized without a volume somehow."
+        if self.checked and self.mask.has_volume() and self.mask.count_cp() >= 3:
             # The volume exists when the VolumeUpdater triggers this method.
             # In that case, it will handle rendering for us.
             return self.mask_updater.queue(do_render)
 
         self.mask_updater.clear_mask()
-        logger.info("Cleared mask")
         if do_render:
             logger.debug("attach_mask:VTK_render()")
             self.view_frame.vtk_render()
         return None
-
-    def initialize_mask(self) -> None:
-        """Initialize the VolumeMaskTPS object.
-
-        Runs on the UI thread; no expensive operations are allowable.
-
-        When "add_points" is True, new points will be added until at least three
-        points exist to form a plane.
-        """
-
-        # TODO: Initialization is now meaningless.
-
-        # Can only decide how to allocate resources if volumes exist.
-        if not self.mask.has_volume():
-            self.error_reporter.illegal_action("The mask can only be initialized when a volume is present.")
-            return
-
-        logger.info("Initializing.")
-
-        # Make sure there are at least 3 control points.
-        for i in range(max(0, 3 - self.mask.count_cp())):
-            self.add_ctrl_pt()
-
-        self.initialized = True
-        self.update_view()
-        self.attach_mask()
-
-    def _uninitialize_mask(self) -> None:
-        """Uninitialize the VolumeMaskTPS object."""
-
-        # TODO: Is there ever a reason to do this? It's meaningless now.
-
-        logger.info("Uninitializing.")
-        self.mask.free()
-        self.initialized = False
-        self.update_view()
-        self.attach_mask()
 
     def to_struct(self) -> dict[str, Any]:
         """Create a serializable structure containing all the data."""
@@ -276,7 +228,6 @@ class ClippingSpline(SceneItem):
         struct["keep_greater_than"] = self.mask.keep_greater_than
         struct["smoothing"] = self.mask.regularization
         struct["show_mesh"] = self.mask_updater.show_mesh
-        struct["initialized"] = self.initialized
         return struct
 
     def from_struct(self, struct: dict[str, Any]) -> list[str]:
@@ -293,7 +244,6 @@ class ClippingSpline(SceneItem):
         keep_greater_than = load_bool("keep_greater_than", struct, errors)
         regularization = load_float("smoothing", struct, errors, min_=0)
         show_mesh = load_bool("show_mesh", struct, errors)
-        initialized = load_bool("initialized", struct, errors)
 
         if len(errors) > 0:
             return errors
@@ -303,13 +253,7 @@ class ClippingSpline(SceneItem):
         self.mask.set_regularization(regularization)
         self.mask_updater.show_mesh = show_mesh
 
-        if self.initialized and not initialized:
-            self._uninitialize_mask()
-        elif not self.initialized and initialized and self.mask.has_volume():
-            # I think it's appropriate here to silently ignore the error when initialization is impossible.
-            self.initialize_mask()
-        else:
-            self.update_view()
-            self.attach_mask()
+        self.update_view()
+        self.attach_mask()
 
         return []

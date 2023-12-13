@@ -407,9 +407,6 @@ you'll have no way to get another!")
         """Called by MainWindow when timeline has new volumes."""
 
         self.camera.on_timeline_loaded(timeline)
-        if self.clipping_spline.initialized:
-            # Only reinitialize it if it was initialized already.
-            self.clipping_spline.initialize_mask()
 
     def volume_update(self, volume: VolumeImage) -> None:
         """Called whenever the active volume is replaced."""
@@ -615,10 +612,10 @@ you'll have no way to get another!")
                 for cp in self.clipping_spline.mask.control_points
             ])
 
-        if new_clipping_spline_struct is not None:
-            errors.extend(self.clipping_spline.from_struct(new_clipping_spline_struct))
-        else:
+        if new_clipping_spline_struct is None:
             self.clipping_spline.attach_mask()
+        else:
+            errors.extend(self.clipping_spline.from_struct(new_clipping_spline_struct))
 
         logger.debug("from_struct:VTK_render()")
         self.view_frame.vtk_render()

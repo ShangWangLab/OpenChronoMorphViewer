@@ -127,3 +127,4 @@ class MaskUpdater:
                 self.view_frame.remove_actor(self.mesh_actor)
                 self.mesh_actor = None
             self.view_frame.v_mapper.SetMaskInput(None)
+        logger.info("Cleared mask")

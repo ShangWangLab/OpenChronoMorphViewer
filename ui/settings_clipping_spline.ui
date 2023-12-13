@@ -118,13 +118,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="button_initialize">
-     <property name="text">
-      <string>Initialize</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="layout_regularization">
      <item>
       <widget class="QLabel" name="label_regularization">
