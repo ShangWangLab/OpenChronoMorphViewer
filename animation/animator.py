@@ -22,15 +22,24 @@ class Animator:
         self.timeline = Timeline(ErrorReportLogger, 0)
 
     def set_volume_dir(self, dir_path: str) -> None:
-        """TODO"""
+        """Add every NRRD file in the directory referenced to the timeline."""
 
         self.set_volume_files(dir_volumes(dir_path))
 
     def set_volume_files(self, volume_paths: list[str]) -> None:
-        """TODO"""
+        """Add the passed volume file paths to the timeline and check their headers.
 
-        # TODO: Add a progress reporter callback.
-        self.timeline.set_file_paths(volume_paths)
+        Report progress on checking the headers every 200 volumes.
+        """
+
+        def progress_callback(progress: int) -> bool:
+            if progress % 200 == 0:
+                print(f"{progress} volume files checked...")
+            return False  # Never cancel the loading operation.
+
+        errors = self.timeline.set_file_paths(volume_paths, progress_callback)
+        assert len(errors) == 0, \
+            "There were errors when loading the volume headers:" + str(errors)
 
     def make_frames(
             self,
@@ -73,7 +82,7 @@ class Animator:
         return AFrameSpan(a_frames)
 
     def add_frames(self, a_frames: AFrameSpan or AFrame) -> None:
-        """TODO"""
+        """Append the frame or frame span passed to the list of frames to render."""
 
         if type(a_frames) == AFrame:
             self.a_frames.append(a_frames.copy())
@@ -81,11 +90,22 @@ class Animator:
             for a_frame in a_frames.a_frames:
                 self.a_frames.append(a_frame.copy())
 
-    def render_frames(self, frame_size: tuple[int, int], start_frame: int = 0) -> None:
+    def render_frames(
+            self,
+            frame_size: tuple[int, int],
+            start_frame: int = 0,
+            keep_order: bool = True) -> None:
         """Ask each animation frame to render itself to the output directory.
 
-        You can change "start_frame" to resume a previous rendering starting from
-        the frame index specified.
+        :param frame_size: The size of the rendering window. Due to VTK
+            limitations, this cannot be larger than your largest monitor.
+        :param start_frame: The index of the first frame to render. You can use
+            this to pick up where you left off if you cancel a rendering. This
+            may cause the applied scene to differ if frame scenes are set up
+            improperly.
+        :param keep_order: When false, animation frames are sorted to improve
+            the rendering speed. This may cause the applied scene to differ if
+            frame scenes are set up improperly.
         """
 
         if not os.path.exists(self.dir_out_path):
@@ -105,11 +125,18 @@ class Animator:
         scene = AMainScene(view, self.timeline)
         print("Initialized the scene.")
 
-        n = len(self.a_frames)
-        for i, a_frame in enumerate(self.a_frames, start=start_frame):
-            print(f"Processing frame {i+1}/{n}...")
+        aframe_indices = list(range(start_frame, len(self.a_frames)))
+        if not keep_order:
+            # Sorting frames by volume ID makes repeated volumes only need to be
+            # loaded into memory once.
+            def frame_key(frame_index: int) -> tuple[int, int]:
+                v = self.a_frames[frame_index].volume
+                return v.scan_index, v.time_index
+            aframe_indices.sort(key=frame_key)
+        for progress, i in enumerate(aframe_indices):
             path_out = os.path.join(self.dir_out_path, f"frame{i:06d}.png")
-            a_frame.render(view, scene, path_out)
+            print(f"Rendering frame {progress+1}/{len(aframe_indices)} to {path_out}")
+            self.a_frames[i].render(view, scene, path_out)
         view.close()
 
     def compile_video(self, video_path: str, compression_level: int = 23, h265: bool = False) -> None:

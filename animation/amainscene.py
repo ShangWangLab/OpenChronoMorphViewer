@@ -186,44 +186,44 @@ class AMainScene:
                 chan.exists = new_channels[i]
                 chan.update_v_prop(self.view_frame)
 
-        # Set up all the clipping planes.
-        if new_planes:
-            # Only clear the existing set of planes if at least one
-            # plane exists in the scene file.
-            for plane in self.planes:
-                plane.deselect()
-            self.planes = []
-            n_active_planes = 0
-            for plane in new_planes:
-                if n_active_planes < MAX_ACTIVE_PLANES:
-                    n_active_planes += int(plane.checked)
-                else:
-                    errors.append(f"Too many planes simultaneously active ({MAX_ACTIVE_PLANES} allowed)")
-                    plane.set_checked(False)
-                self.planes.append(plane)
-                if self.bounds is not None:
-                    plane.place(self.bounds)
-            logger.debug("Added planes.")
-            self.update_clipping_planes()
+        # Set up all the clipping planes. Normally, we don't remove old clipping
+        # planes unless new ones exist, but for animation, we don't want to keep
+        # anything around.
+        for plane in self.planes:
+            plane.deselect()
+        self.planes = []
+        n_active_planes = 0
+        for plane in new_planes:
+            if n_active_planes < MAX_ACTIVE_PLANES:
+                n_active_planes += int(plane.checked)
+            else:
+                errors.append(f"Too many planes simultaneously active ({MAX_ACTIVE_PLANES} allowed)")
+                plane.set_checked(False)
+            self.planes.append(plane)
+            if self.bounds is not None:
+                plane.place(self.bounds)
+        logger.debug("Added planes.")
+        self.update_clipping_planes()
 
-        # Set up the clipping spline and all its control points.
-        if new_cps:
-            # Remove old control points.
-            for cp in reversed(self.clipping_spline.mask.control_points):
-                self.clipping_spline.mask.delete_cp(cp)
-                cp.deselect()
+        # Set up the clipping spline and all its control points. Same deal: no
+        # old control points can remain.
 
-            # Insert new control points after the clipping spline, starting
-            # with the last so the order is preserved.
-            for cp in reversed(new_cps):
-                if self.bounds is not None:
-                    cp.place(self.bounds)
-                cp.update_visibility()
-                self.clipping_spline.mask.add_cp(cp)
+        # Remove old control points.
+        for cp in reversed(self.clipping_spline.mask.control_points):
+            self.clipping_spline.mask.delete_cp(cp)
+            cp.deselect()
 
-        if new_clipping_spline_struct is not None:
-            errors.extend(self.clipping_spline.from_struct(new_clipping_spline_struct))
-        else:
+        # Insert new control points after the clipping spline, starting
+        # with the last so the order is preserved.
+        for cp in reversed(new_cps):
+            if self.bounds is not None:
+                cp.place(self.bounds)
+            cp.update_visibility()
+            self.clipping_spline.mask.add_cp(cp)
+
+        if new_clipping_spline_struct is None:
             self.clipping_spline.attach_mask()
+        else:
+            errors.extend(self.clipping_spline.from_struct(new_clipping_spline_struct))
 
         return errors

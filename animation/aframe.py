@@ -14,38 +14,35 @@ class AFrame:
         self.scene: Optional[AScene] = None
 
     def apply_scene(self, scene: AScene) -> None:
-        """TODO"""
+        """Set this animation frame's scene to a copy of the one passed."""
 
         self.scene = scene.copy()
 
     def copy(self) -> "AFrame":
-        """TODO"""
+        """Make a new, identical animation frame."""
 
         a_frame = AFrame(self.volume)
         a_frame.apply_scene(self.scene)
         return a_frame
 
     def render(self, view: AView, scene: AMainScene, path_out: str) -> None:
-        """TODO"""
+        """Create an image file corresponding to this animation frame.
 
-        print("Loading the volume...")
+        :param view: The global rendering object.
+        :param scene: The global scene on which to apply this frame's scene.
+        :param path_out: The file path for the image output.
+        """
+
+        # Just load; unloading volumes is handled by the AView.
         self.volume.load()
         view.set_volume_input(self.volume)
         scene.volume_update(self.volume)
-        print("Loaded the volume!")
 
         if self.scene is not None:
-            if "ClippingSpline" in self.scene.items:
-                spline = self.scene.items["ClippingSpline"]
-                spline["initialized"] = spline["checked"]
             errors = scene.from_struct(self.scene.to_struct())
-            assert len(errors) == 0, \
-                "Errors occurred while loading the scene:\n" + "\n".join(errors)
+            assert len(errors) == 0, "Errors occurred while loading the scene:\n" + "\n".join(errors)
 
-        print(f"Rendering '{path_out}'...")
         view.to_image(path_out)
-        # Unloading the volumes is handled by the AView.
-        print("Rendered!")
 
         # Optional, but it makes the window unfreeze.
         view.interactor.ProcessEvents()
