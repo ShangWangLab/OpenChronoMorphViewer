@@ -51,6 +51,7 @@ def main() -> None:
     log_manager.start_logging()
     log_manager.start_fault_handler()
 
+    # noinspection PyBroadException
     try:
         # Handle high resolution displays.
         if hasattr(Qt, "AA_EnableHighDpiScaling"):
@@ -70,8 +71,8 @@ def main() -> None:
         main_window.start()
         app.exec()
         logger.info("Application exited correctly.")
-    except RuntimeError as e:
-        logger.exception(f"UI thread crashed: {e}")
+    except:
+        logger.exception(f"UI thread crashed")
     log_manager.end()
 
 

@@ -75,6 +75,9 @@ class Timeline:
         # simultaneously. That would result in inaccurate memory usage
         # reports and potentially more volumes in memory than permitted.
         self.load_lock = Lock()
+        # While the contents of the timeline are changing, it is impermissible
+        # to access the volumes. This is implemented via a readers-writer lock.
+        # TODO: self.rw_lock = ...
         self.index: int = 0
         self.volumes: list[VolumeImage] = []
         # Bytes of memory used (estimate). Do not edit this estimate without
@@ -221,35 +224,27 @@ class Timeline:
 
         assert self, "You need to call set_file_paths first."
 
-        logger_load.info(f"Trying to load volume {index}.")
-
-        v: VolumeImage = self.volumes[index]
-
         with self.load_lock:
-            if v.is_loaded():
+            logger_load.info(f"Trying to load volume {index}.")
+            vol: VolumeImage = self.volumes[index]
+            if vol.is_loaded():
                 logger_load.info(f"Already loaded {index}.")
                 return
 
-            self.memory_used += v.estimate_memory()
-            i: int = len(self.volumes) - 1
-            while i >= 0 and self.memory_used > self.memory_target:
-                j: int = self.indices_by_cache_priority[i]
-                vj: VolumeImage = self.volumes[j]
-                # There is no risk of unloading the volume we were just
-                # asked to load because at this point, we know it is unloaded.
-                logger_load.debug(f"Try to free {j}?")
-                if vj.is_loaded():
-                    assert j != index, "Tried to free the volume intended for loading."
-                    # Find the memory before you unload because the estimate
-                    # changes when the mask is unloaded.
-                    memory_recovered = vj.estimate_memory()
-                    vj.unload()
-                    self.memory_used -= memory_recovered
-                    logger_load.info(
-                        f"Unloaded {j} and recovered {memory_recovered:0.2g}.")
-                i -= 1
+            self.memory_used += vol.estimate_memory()
+            for v in sorted(filter(lambda vo: vo.is_loaded(), self.volumes),
+                            key=lambda vo: vo.access_time):
+                if self.memory_used <= self.memory_target:
+                    break
+                # Find the memory before you unload because the estimate
+                # changes when the mask is unloaded.
+                memory_recovered = v.estimate_memory()
+                v.unload()
+                self.memory_used -= memory_recovered
+                logger_load.debug(f"Unloaded volume S{v.scan_index}T{v.time_index} \
+last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes.")
 
-            error_message = v.load()
+            error_message = vol.load()
             if error_message is not None:
                 self.error_reporter.file_errors([error_message])
             logger_load.info(f"Loaded {index}.")
@@ -378,8 +373,7 @@ class Timeline:
         # bias". It is approximately the number of forward-looking volumes
         # that go ahead of each backward-looking volume in the queue.
         # The addition of 1 smooths the metric a little and prevents division by 0.
-        cache_priorities = 4 / (1 + forward_distances) + 1 / (
-                1 + backward_distances)
+        cache_priorities = 4 / (1 + forward_distances) + 1 / (1 + backward_distances)
 
         self.indices_by_cache_priority = list(range(len(self.volumes)))
         self.indices_by_cache_priority.sort(key=lambda i: cache_priorities[i],
@@ -429,8 +423,8 @@ class Timeline:
             while True:
                 # Verify that no threads are running whose operation would
                 # be slowed by this cache thread loading an extra volume.
-                # This is not race-condition proof, but a race-condition
-                # here is unlikely to happen, and the worst case result is a
+                # This is not race-condition-proof, but a race-condition
+                # here is unlikely to happen, and the worst-case result is a
                 # momentary lag in the volume loader.
                 for pt in self.priority_threaders:
                     t = pt.thread

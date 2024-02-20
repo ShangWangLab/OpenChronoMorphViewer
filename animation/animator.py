@@ -1,5 +1,8 @@
 import os
-from typing import Callable, Optional
+from typing import (
+    Callable,
+    Optional,
+)
 
 from animation.aframe import AFrame
 from animation.aframespan import AFrameSpan
@@ -44,13 +47,15 @@ class Animator:
     def make_frames(
             self,
             inclusion_criteria: Optional[Callable[[VolumeImage], bool]] = None,
-            volume_rate: float = 1,
+            volume_rate: float = 1.,
             absolute_rate: bool = False) -> AFrameSpan:
         """Produce a span of frames at the render frame rate, each with an associated volume.
 
         When "absolute_rate" is True, "volume_rate" is specified directly as
         volumes/sec, otherwise it is relative to the period specified by the
-        volumes themselves.
+        volumes themselves. For example, if the volume rate is 0.3, then the
+        resulting video will play at 30% of real-time, assuming the period
+        specified by the volumes is accurate.
 
         "absolute_rate" as True may behave unstably when both:
         1. The acquisition period varies, and
@@ -80,6 +85,11 @@ class Animator:
                 i += volume_rate / (vol.period*self.frame_rate)
                 ii = int(i)
         return AFrameSpan(a_frames)
+
+    def clear_frames(self) -> None:
+        """Reset/empty the list of frames to render."""
+
+        self.a_frames = []
 
     def add_frames(self, a_frames: AFrameSpan or AFrame) -> None:
         """Append the frame or frame span passed to the list of frames to render."""
@@ -150,7 +160,7 @@ class Animator:
             "ffmpeg",
             f"-r {self.frame_rate:f}",
             f"-start_number 0",
-            f'-i "{self.dir_out_path}/frame%06d.png"',
+            f'-i "' + os.path.join(self.dir_out_path, "frame%06d.png") + '"',
             f"-vframes {len(self.a_frames)}",
             "-c:v libx26" + ("5" if h265 else "4"),
             f"-crf {compression_level}",

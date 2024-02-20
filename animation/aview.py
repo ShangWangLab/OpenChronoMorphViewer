@@ -59,12 +59,12 @@ class AView:
         self.renderer.SetBackground(0, 0, 0)
         self.ren_win.AddRenderer(self.renderer)
 
-        print("Setting up the interactor...")
+        logger.debug("Setting up the interactor...")
         self.interactor = vtkRenderWindowInteractor()
         self.interactor.SetRenderWindow(self.ren_win)
         self.interactor.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
         self.interactor.Initialize()
-        print("Set up the interactor!")
+        logger.debug("Set up the interactor!")
 
         self.last_volume: Optional[VolumeImage] = None
 
