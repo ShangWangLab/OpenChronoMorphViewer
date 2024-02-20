@@ -84,8 +84,8 @@ class Scene:
         self.bounds: Optional[ImageBounds] = None
         self.n_active_planes: int = 0
         self.resize_event_filter: Optional[ResizeEventFilter] = None
-        self.last_save_path: Optional[str] = None
-        self.keyframe_count: int = 0
+        self.last_save_path: str = ""
+        self.last_keyframe_path: str = ""
         self.last_volume: Optional[VolumeImage] = None
 
         # Make all the possible channels, but only list one initially.
@@ -206,8 +206,13 @@ class Scene:
         """
 
         # The UI initializes with an empty widget by default, so you can
-        # always destroy it.
-        self.ui.scene_scroller.takeWidget().destroy()
+        # usually destroy it, but at some point, this caused a crash. It's
+        # unclear how the widget became None.
+        old_widget = self.ui.scene_scroller.takeWidget()
+        if old_widget is not None:
+            old_widget.destroy()
+        else:
+            logger.debug("The scene scroller lost its widget somehow!")
 
         # No race condition; this runs on the UI thread.
         for i in range(self.ui.scene_list.count()):
@@ -547,6 +552,9 @@ you'll have no way to get another!")
                 continue
             encountered.add(t)
 
+        self.camera.update_view()
+        self.scale_bar.update_view()
+
         # Set up all the image channels. Leave any existing channel items where
         # they are, and put any new channel items after the last item removed.
         if any(new_channels):
@@ -621,7 +629,53 @@ you'll have no way to get another!")
         self.view_frame.vtk_render()
         return errors
 
-    def save_to_file(self, path: str, keyframe: bool = False) -> None:
+    def default_keyframe_path(self, cwd: str = ".") -> str:
+        """Find the best guess for the next keyframe path.
+
+        Keyframes are usually named like dir_path/kf_saved-name_xxxx.json
+        When the user specifies an unusual name, try to match it.
+
+        :param cwd: The current working directory to use as a default when the
+            directory is otherwise unknown.
+        """
+
+        if self.last_keyframe_path:
+            root, file_name = os.path.split(self.last_keyframe_path)
+            file_name_l = file_name.lower()
+            if file_name_l.endswith(".json"):
+                file_name = file_name[:-len(".json")]
+            name_parts = file_name.split("_")
+            kf_i = -1
+            try:
+                kf_i = int(name_parts[-1])
+                name_parts = name_parts[:-1]
+            except (IndexError, ValueError):
+                pass
+            if kf_i < 0:  # int(...) might give a negative number.
+                return self.last_keyframe_path
+            kf_i += 1
+            name_parts.append(f"{kf_i:04d}.json")
+            return os.path.join(root, "_".join(name_parts))
+        if self.last_save_path:
+            root, file_name = os.path.split(self.last_save_path)
+            file_name_l = file_name.lower()
+            if file_name_l.endswith(".json"):
+                file_name = file_name[:-len(".json")]
+            if file_name_l.startswith("kf_"):
+                file_name = file_name[len("kf_"):]
+            name_parts = file_name.split("_")
+            kf_i = -1
+            try:
+                kf_i = int(name_parts[-1])
+                name_parts = name_parts[:-1]
+            except (IndexError, ValueError):
+                pass
+            kf_i = max(0, kf_i + 1)
+            name_parts = ["kf"] + name_parts + [f"{kf_i:04d}.json"]
+            return os.path.join(root, "_".join(name_parts))
+        return os.path.join(cwd, "kf_0.json")
+
+    def save_to_file(self, path: str = "", keyframe: bool = False) -> None:
         """Write the scene data to the file specified at path.
 
         Reports an error to the user when file write fails.
@@ -631,12 +685,13 @@ you'll have no way to get another!")
         """
 
         if keyframe:
-            # Keyframes need to be named specially.
-            root, file_name = os.path.split(path)
-            if file_name.lower().endswith(".json"):
-                file_name = file_name[:-len(".json")]
-            file_name = f"kf_{file_name}_{self.keyframe_count:04d}.json"
-            path = os.path.join(root, file_name)
+            self.last_keyframe_path = path
+        elif path:  # Save as.
+            self.last_save_path = path
+            self.last_keyframe_path = ""
+        else:  # Regular save.
+            path = self.last_save_path
+        assert path, "Tried to save with no path specified."
 
         try:
             with open(path, "w") as file:
@@ -647,6 +702,9 @@ you'll have no way to get another!")
 
     def load_from_file(self, path: str) -> None:
         """Load the scene data from the file specified at path."""
+
+        self.last_save_path = path
+        self.last_keyframe_path = ""
 
         error_msg: Optional[str] = None
         try:

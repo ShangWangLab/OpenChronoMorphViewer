@@ -25,6 +25,24 @@ class AScene:
             else:
                 self.items[t] = item
 
+    def __add__(self, other: "AScene") -> "AScene":
+        """Combine this scene with the other scene.
+
+        Items in the scene on the right of the addition sign will be prioritized
+        over items in the left scene. E.g., when both scenes contain a camera,
+        the right scene's camera will dominate.
+
+        Nonetheless, you should avoid adding scenes which contain overlapping
+        items.
+        """
+
+        result = AScene([])
+        result.items = self.items | other.items
+        result.clipping_planes = self.clipping_planes + other.clipping_planes
+        result.control_points = self.control_points + other.control_points
+        result.image_channels = self.image_channels + other.image_channels
+        return result.copy()
+
     def copy(self) -> "AScene":
         """Copy the underlying data structure to a new animation scene."""
 

@@ -244,5 +244,4 @@ class ScaleBar(SceneItem):
 
         self.width = width_microns
         self.show_label = show_label
-        self.update_view()
         return []

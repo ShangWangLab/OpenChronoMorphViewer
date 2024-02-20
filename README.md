@@ -22,16 +22,23 @@ This project may not be a good fit if you need to:
 
 ## Dependencies
 
-Developed for Python version 3.10.10.
+Required software:
+- [Python](https://www.python.org/downloads) version 3.11.4
+- [FFMPEG](https://ffmpeg.org/download.html) (only required for animating videos)
 
-Required 3rd party packages:
-- NumPy 1.23.5 for 3D data operations
-- PyNRRD 1.0.0 (Nearly Raw Raster Data) for the image file format
-- PyQt5 for the user interface
-- SciPy 1.10.1 for the cdist function
-- VTK 9.2.6 for volumetric rendering
+Required 3rd party Python packages:
+- NumPy 1.25.2 for 3D data operations
+- PSutil 5.9.5 for getting the current RAM usage
+- PyNRRD 1.0.0 for the image file format (Nearly Raw Raster Data)
+- PyQt5 5.15.2.2.3 for the user interface
+- SciPy 1.11.1 for the "cdist" function
+- PyVTK 9.2.6 for volumetric rendering
 
-See [dependency-install.bat](dependency-install.bat) for an example of the command to install all the dependencies.
+See [dependency-install.bat](dependency-install.bat) for an example of the command to install all the Python dependencies.
+
+## Supported file formats
+
+OCMV is designed to load 3D volumes, each in a separate NRRD file. The files can either have attached headers or run in headless mode, but the volume file must have three spatial dimensions (XYZ), with an optional channel dimension (C) ordered from fastest to slowest as CXYZ. Image values must be either unsigned 8-bit or 16-bit. Timing information can be specified via custom fields in the NRRD header.
 
 ## License
 

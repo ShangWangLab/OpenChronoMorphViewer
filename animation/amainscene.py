@@ -70,7 +70,7 @@ class AMainScene:
         for plane in self.planes:
             plane.place(self.bounds)
         self.clipping_spline.update_bounds(self.bounds)
-        self.clipping_spline.attach_mask(volume)
+        self.clipping_spline.mask.set_volume(volume)
 
     def update_clipping_planes(self) -> None:
         """Set the active clipping planes in the VTK volume mapper.
@@ -178,6 +178,8 @@ class AMainScene:
                 errors.append(f"Unrecognized item type: '{t}'")
                 continue
             encountered.add(t)
+
+        self.scale_bar.update_view()
 
         # Set up all the image channels. Leave any existing channel items where
         # they are, and put any new channel items after the last item removed.

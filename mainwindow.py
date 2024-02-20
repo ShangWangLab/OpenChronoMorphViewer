@@ -170,10 +170,10 @@ class MainWindow(QMainWindow):
         Only opens a file dialog if no save file has been previously created.
         """
 
-        if self.scene.last_save_path is None:
-            self.on_save_scene_as()
+        if self.scene.last_save_path:
+            self.scene.save_to_file()
         else:
-            self.scene.save_to_file(self.scene.last_save_path)
+            self.on_save_scene_as()
 
     def on_save_scene_as(self, _: bool = False) -> None:
         """Responds to "Save Scene As..." action.
@@ -181,52 +181,44 @@ class MainWindow(QMainWindow):
         Always open a file dialog.
         """
 
+        default_path = self.scene.last_save_path or self.CWD_path
         file_path, file_filter = QFileDialog.getSaveFileName(
             self,                                 # Parent.
             "Save scene",                         # Caption.
-            self.CWD_path,                        # Directory.
+            default_path,                         # Directory.
             "Scene File (*.json);;Any File (*)")  # File filter options.
         if not file_path:
             return
-        # Update the current directory in case they open another file.
-        self.CWD_path = os.path.split(file_path)[0]
-        self.scene.last_save_path = file_path
         self.scene.save_to_file(file_path)
-        self.scene.keyframe_count = 0
 
     def on_save_keyframe(self, _: bool = False) -> None:
         """Responds to "Save Keyframe..." action."""
 
-        if self.scene.last_save_path is None:
-            file_path, file_filter = QFileDialog.getSaveFileName(
-                self,                                    # Parent.
-                "Save keyframe",                         # Caption.
-                self.CWD_path,                           # Directory.
-                "Keyframe File (*.json);;Any File (*)")  # File filter options.
-            if not file_path:
-                return
-            # Update the current directory in case they open another file.
-            self.CWD_path = os.path.split(file_path)[0]
-            self.scene.last_save_path = file_path
-            self.scene.keyframe_count = 0
-        else:
-            file_path = self.scene.last_save_path
+        default_path = self.scene.default_keyframe_path(self.CWD_path)
+        file_path, file_filter = QFileDialog.getSaveFileName(
+            self,                                    # Parent.
+            "Save keyframe",                         # Caption.
+            default_path,                            # File/directory.
+            "Keyframe File (*.json);;Any File (*)")  # File filter options.
+        if not file_path:
+            return
         self.scene.save_to_file(file_path, keyframe=True)
-        self.scene.keyframe_count += 1
 
     def on_load_scene(self, _: bool = False) -> None:
         """Responds to "Load Scene..." action."""
 
+        default_dir = (
+            os.path.split(self.scene.last_save_path)[0]
+            if self.scene.last_save_path
+            else self.CWD_path
+        )
         file_path, file_filter = QFileDialog.getOpenFileName(
             self,                                 # Parent.
             "Load scene",                         # Caption.
-            self.CWD_path,                        # Directory.
+            default_dir,                          # Directory.
             "Scene File (*.json);;Any File (*)")  # File filter options.
         if not file_path:
             return
-        # Update the current directory in case they open another file.
-        self.CWD_path = os.path.split(file_path)[0]
-        self.scene.last_save_path = file_path
         self.scene.load_from_file(file_path)
 
     def on_screenshot(self, _: bool = False) -> None:

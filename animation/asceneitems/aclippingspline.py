@@ -73,10 +73,10 @@ class AClippingSpline(ASceneItem):
 
             mask_vtk = self.mask.get_vtk()
             self.view_frame.v_mapper.SetMaskInput(mask_vtk)
-            print("Set mask")
+            logger.debug("Set mask")
         else:
             self.view_frame.v_mapper.SetMaskInput(None)
-            print("Cleared mask")
+            logger.debug("Cleared mask")
 
     def from_struct(self, struct: dict[str, Any]) -> list[str]:
         """Set values based on the data given in struct.

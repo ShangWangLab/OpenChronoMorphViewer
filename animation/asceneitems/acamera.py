@@ -59,8 +59,6 @@ class ACamera(ASceneItem):
 
         Returns any errors that may have occurred when decoding.
 
-        Does not update the view of this widget. That is left for the caller.
-
         Must call "set_interp" after to finish the initialization.
         """
 
@@ -72,7 +70,6 @@ class ACamera(ASceneItem):
             return errors
 
         self.linear_interp = linear_interp
-        self.update_view()
         return []
 
 

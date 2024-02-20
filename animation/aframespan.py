@@ -5,11 +5,17 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 from tps import ThinPlateSpline
-from vtkmodules.vtkRenderingCore import vtkCameraInterpolator, vtkCamera
+from vtkmodules.vtkRenderingCore import (
+    vtkCameraInterpolator,
+    vtkCamera,
+)
 
 from animation.aframe import AFrame
 from animation.ascene import AScene
-from animation.asceneitems.acamera import vtk_camera_from_struct, vtk_camera_to_struct
+from animation.asceneitems.acamera import (
+    vtk_camera_from_struct,
+    vtk_camera_to_struct,
+)
 from animation.asceneitems.acontrolpoint import cp_origin_to_struct
 from volumeimage import VolumeImage
 

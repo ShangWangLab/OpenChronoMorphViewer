@@ -395,7 +395,7 @@ class ImageChannel(SceneItem):
             a, b = self.scalar_range
             for x_norm, o, c in self._make_transfer_func():
                 # Expand x to the full range.
-                x_full = (b - a) * (x_norm - a)
+                x_full = a + (b - a) * x_norm
                 logger.debug(f"Adding point, x={x_full}, o={o}, c={c}")
                 otf.AddPoint(x_full, o)
                 ctf.AddRGBPoint(x_full, *c)

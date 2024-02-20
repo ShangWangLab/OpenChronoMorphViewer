@@ -1,5 +1,6 @@
 import logging
 import math
+import time
 from threading import Lock
 from typing import (
     Any,
@@ -43,10 +44,16 @@ class VolumeImage:
         # This lock prevents the data from being partially unloaded while it
         # is loading, or vice versa.
         self.load_lock = Lock()
+        # The system timestamp for when this volume was last accessed. Used for
+        # determining which volume to unload in the timeline.
+        self.access_time: float = 0.
+        # Used to display the volume info bar.
         self.label: str = ""
+        # The header read from the NRRD file.
         self.header: Optional[dict[str, Any]] = None
 
         self.dtype: Optional[np.dtype] = None
+        self.switch_endian: bool = False
         self.dims: Optional[npt.NDArray[np.int_]] = None
         self.origin: npt.NDArray[np.float64] = np.zeros((3,), np.float64)
         self.scale: npt.NDArray[np.float64] = np.ones((3,), np.float64)
@@ -92,8 +99,11 @@ class VolumeImage:
                 self.dtype = nrrd.reader._determine_datatype(header)
             except nrrd.NRRDError as e:
                 return FileError(f"Invalid NRRD file: {e}", self.path)
-            if self.dtype not in [np.uint8, np.uint16]:
-                return FileError(f"Pixel data type {self.dtype} is unsupported (uint8 and uint16 only)",
+            self.switch_endian = not self.dtype.isnative
+            if self.switch_endian:
+                self.dtype = self.dtype.newbyteorder()
+            if self.dtype not in [np.uint8, np.uint16, np.int16]:
+                return FileError(f"Pixel data type {self.dtype} is unsupported (uint8, uint16, int16 only)",
                                  self.path)
             # [C,X,Y,Z] array size in pixels.
             self.dims = header["sizes"]
@@ -106,13 +116,15 @@ class VolumeImage:
                 return FileError(f"{n_channels}-channel images are not supported (4 max)", self.path)
             # XYZ voxel dimensions in microns.
             directions: npt.NDArray[np.float64] = header["space directions"]
-            # Sometimes directions will be specified for the channel. These can be ignored.
             if directions.shape == (4, 3):
+                # Sometimes directions will be specified for the channel. These can be ignored.
                 directions = directions[1:, :]
             elif directions.shape != (3, 3):
                 return FileError("The space directions are malformed", self.path)
             # We do not attempt to interpret skew or rotation of the "space directions" matrix.
             self.scale = np.linalg.norm(directions, axis=1)
+            if np.any(self.scale <= 0):
+                return FileError("The space directions are not positive", self.path)
             # XYZ center offset in pixels.
             if "space origin" in header:
                 self.origin = header["space origin"]
@@ -197,6 +209,8 @@ class VolumeImage:
             return 0., 255.
         if self.dtype == np.uint16:
             return 0., 65535.
+        if self.dtype == np.int16:
+            return -32768., 32767.
         raise RuntimeError(f"Unsupported data type: {self.dtype}.")
 
     def get_n_channels(self) -> int:
@@ -251,7 +265,9 @@ class VolumeImage:
             # Channel-less images need to reshaped to have one channel.
             if len(self.image.shape) == 3:
                 self.image = self.image.reshape(self.dims)
-
+            # The endianness needs to be native for VTK to display properly.
+            if self.switch_endian:
+                self.image.byteswap(True)
             self._make_vtk_image()
 
         # No error message to report.
@@ -276,6 +292,8 @@ class VolumeImage:
             self.vtk_image.SetDataScalarTypeToUnsignedChar()
         elif self.dtype == np.uint16:
             self.vtk_image.SetDataScalarTypeToUnsignedShort()
+        elif self.dtype == np.int16:
+            self.vtk_image.SetDataScalarTypeToShort()
         else:
             raise RuntimeError("It is supposed to be impossible to set the wrong data type.")
         self.vtk_image.SetNumberOfScalarComponents(self.dims[0])
@@ -324,20 +342,21 @@ class VolumeImage:
         :param n_volumes: The total number of volume in the timeline.
         """
 
-        timestamp = str(1 + self.scan_index)
+        timestamp = str(self.scan_index)
         if self.timestamp is not None:
             timestamp += " (" + self.timestamp + ")"
 
         self.label = (
             f"φ = {self.get_phase():.1%}, "
-            f"t1 = {1 + self.time_index}/{self.n_times} ({time_sum:0.3f} {self.period_unit}), "
+            f"t1 = {self.time_index}/{self.n_times} ({time_sum:0.3f} {self.period_unit}), "
             f"t2 = {timestamp}, "
-            f"i = {1 + index}/{n_volumes}"
+            f"i = {index + 1}/{n_volumes}"
         )
 
     def get_vtk_image(self) -> vtkImageImport:
         """Returns a handle to the VTK image."""
 
+        self.access_time = time.time()
         self.load()
         return self.vtk_image
 

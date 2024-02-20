@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from PyQt5.QtCore import (
     pyqtSignal,
@@ -43,6 +44,10 @@ class ViewFrame(QFrame):
 
     def __init__(self, parent: QFrame) -> None:
         super().__init__(parent)
+
+        # Need a handle on the old volume so it doesn't get garbage collected
+        # while switching active volumes.
+        self._current_volume_image: Optional[VolumeImage] = None
 
         # Initialize stuff here.
         self._setup_misc_vtk()
@@ -156,6 +161,7 @@ class ViewFrame(QFrame):
         self.v_mapper.SetInputConnection(
             volume.get_vtk_image().GetOutputPort()
         )
+        self._current_volume_image = volume
         logger.debug("Added volume data to mapper.")
 
     def attach_volume(self) -> None:

@@ -329,5 +329,4 @@ class Camera(SceneItem):
         self.camera.SetParallelScale(scale)
         self.camera.SetParallelProjection(orthographic)
         self.linear_interp = linear_interp
-        self.update_view()
         return []
