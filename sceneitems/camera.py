@@ -79,10 +79,8 @@ class Camera(SceneItem):
         self.camera.Azimuth(30)
         self.camera.Elevation(10)
 
-        self.edit_filter_from: Optional[EditDoneEventFilter] = None
         self.edit_filter_to: Optional[EditDoneEventFilter] = None
         self.edit_filter_roll: Optional[EditDoneEventFilter] = None
-
         self.linear_interp: bool = True
         view_frame.v_prop.SetInterpolationType(int(self.linear_interp))
 
@@ -197,12 +195,11 @@ class Camera(SceneItem):
             logger.debug("update_roll:VTK_render()")
             view_frame.vtk_render()
 
-        self.edit_filter_from = EditDoneEventFilter(update_position)
         self.edit_filter_to = EditDoneEventFilter(update_focal_point)
         self.edit_filter_roll = EditDoneEventFilter(update_roll)
-        self.ui_settings.edit_from_x.installEventFilter(self.edit_filter_from)
-        self.ui_settings.edit_from_y.installEventFilter(self.edit_filter_from)
-        self.ui_settings.edit_from_z.installEventFilter(self.edit_filter_from)
+        self.ui_settings.edit_from_x.returnPressed.connect(update_position)
+        self.ui_settings.edit_from_y.returnPressed.connect(update_position)
+        self.ui_settings.edit_from_z.returnPressed.connect(update_position)
         self.ui_settings.edit_to_x.installEventFilter(self.edit_filter_to)
         self.ui_settings.edit_to_y.installEventFilter(self.edit_filter_to)
         self.ui_settings.edit_to_z.installEventFilter(self.edit_filter_to)
