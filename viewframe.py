@@ -198,7 +198,7 @@ class ViewFrame(QFrame):
 
         if self.renderer.GetVolumes().GetNumberOfItems() > 0:
             self.interactor.GetRenderWindow().Render()
-            logger.info("VTK rendered")
+            logger.info("VTK rendered.")
 
     def add_actor(self, actor: vtkActor) -> None:
         """Request that the UI thread add the passed actor."""
