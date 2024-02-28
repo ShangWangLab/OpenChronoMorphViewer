@@ -124,7 +124,7 @@ class PlaneController(SceneItem):
         self.list_widget.setText(self.name)
 
     def _input_origin(self) -> None:
-        """Called when the normal is set in the UI line edits."""
+        """Called when the origin is set in the UI line edits."""
 
         x = validate_float_any(self.ui_settings.edit_origin_x.text())
         y = validate_float_any(self.ui_settings.edit_origin_y.text())
