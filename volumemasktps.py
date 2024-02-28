@@ -435,7 +435,7 @@ class VolumeMaskTPS:
             logger.info("The mask doesn't need updating.")
             return self.mask
 
-        logger.info(f"Rebuilding the spline for axis {axis}...")
+        logger.info(f"Rebuilding the spline grid for axis {axis}...")
 
         a0, a1 = _make_grid_axes(i_lower, i_upper, i_dims)
         dep_var = _make_dep_var(a0, a1, parameters, i_ctrl)
@@ -464,7 +464,7 @@ class VolumeMaskTPS:
 
         mask_shape = tuple(v_dims[::-1])
         if self.mask is None or self.mask.shape != mask_shape:
-            logger.info("Allocated a new mask array.")
+            logger.info("Allocating a new mask array...")
             self.mask = np.empty(mask_shape, np.uint8)
 
         if mask_update == MaskUpdate.PARTIAL:

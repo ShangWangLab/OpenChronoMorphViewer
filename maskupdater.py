@@ -96,10 +96,11 @@ class MaskUpdater:
                     self.mesh_actor = self.mask.make_mesh()
                     self.view_frame.add_actor(self.mesh_actor)
                     logger.debug("Added the mesh actor.")
-                logger.info("Requesting render to show TPS mesh.")
-                self.view_frame.vtk_render()
+                    logger.info("Requesting render to show TPS mesh.")
+                    self.view_frame.vtk_render()
                 self.lock.release()
 
+                logger.debug("Getting the VTK mask...")
                 mask_vtk = self.mask.get_vtk()
                 self.view_frame.v_mapper.SetMaskInput(mask_vtk)
                 logger.debug("Set volume mask input.")
