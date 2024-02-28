@@ -41,6 +41,7 @@ class ControlPoint(PlaneController):
                  origin: Vec3,
                  view_frame: ViewFrame,
                  clipping_spline: "ClippingSpline") -> None:
+        self.suppress_next_interaction: bool = False
         self.view_frame: ViewFrame = view_frame
         self.clipping_spline: "ClippingSpline" = clipping_spline
         self.sphere_source = vtkSphereSource()
@@ -59,6 +60,10 @@ class ControlPoint(PlaneController):
             Can be used as a VTK event callback. The arguments are ignored.
             """
 
+            # Interactions can be triggered by a "pick" event, even when the
+            # plane doesn't change. This would cause needless clipper updates,
+            # so we suppress the next interaction event.
+            self.suppress_next_interaction = True
             self.scene_list.setCurrentItem(self.list_widget)
             logger.info("Picked.")
 
@@ -77,6 +82,12 @@ class ControlPoint(PlaneController):
             Can be used as a VTK event callback. The arguments are ignored.
             """
 
+            # Interactions can be triggered by a "pick" event, even when the
+            # plane doesn't change. This would cause needless clipper updates,
+            # so we suppress the next interaction event.
+            if self.suppress_next_interaction:
+                self.suppress_next_interaction = False
+                return
             self.update_view()
             self.sphere_source.SetCenter(self.get_origin())
             self.clipping_spline.mask.update_cp(self)
@@ -142,7 +153,7 @@ class ControlPoint(PlaneController):
         )
 
     def _input_origin(self) -> None:
-        """Called when the normal is set in the UI line edits."""
+        """Called when the origin is set in the UI line edits."""
 
         super()._input_origin()
         self.clipping_spline.mask.update_cp(self)
