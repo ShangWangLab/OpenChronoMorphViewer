@@ -83,6 +83,9 @@
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>The direction and side to clip from.</string>
+       </property>
        <item>
         <property name="text">
          <string>x &gt; f(y, z)</string>
@@ -134,11 +137,38 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Units approximately equal to the world-coordinates.</string>
+       </property>
        <property name="inputMask">
         <string/>
        </property>
        <property name="text">
         <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="layout_upscale">
+     <item>
+      <widget class="QLabel" name="label_upscale">
+       <property name="text">
+        <string>Up-scale</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="edit_upscale">
+       <property name="toolTip">
+        <string>Values &gt;1 speed up mask generation at the cost of lower resolution.</string>
+       </property>
+       <property name="text">
+        <string>1</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

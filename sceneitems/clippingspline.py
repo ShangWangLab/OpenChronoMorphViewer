@@ -49,6 +49,11 @@ class ClippingSpline(SceneItem):
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Unchecked  # type: ignore
     UI_SETTINGS_CLASS = Ui_SettingsClippingSpline
 
+    # We set the maximum for convenience so the user can't set
+    # it to infinity, etc. This number is vastly more than enough. A
+    # typical value would be something like 3.
+    _MAX_UPSCALE: float = 10000.
+
     def __init__(self,
                  error_reporter: ErrorReporter,
                  view_frame: ViewFrame,
@@ -63,6 +68,7 @@ class ClippingSpline(SceneItem):
         self.mask_updater: MaskUpdater = MaskUpdater(self.mask, view_frame)
         self.bounds: Optional[ImageBounds] = None
         self.regularization_filter: Optional[EditDoneEventFilter] = None
+        self.upscale_filter: Optional[EditDoneEventFilter] = None
 
     def add_to_scene_list(self, scene_list: Optional[QListWidget]) -> None:
         """Make a list widget item and adds it to the scene list.
@@ -84,6 +90,9 @@ class ClippingSpline(SceneItem):
         )
         self.ui_settings.edit_regularization.setText(
             nice_exp_format(f"{self.mask.regularization:.4g}")
+        )
+        self.ui_settings.edit_upscale.setText(
+            nice_exp_format(f"{self.mask.upscale:.4g}")
         )
         self.ui_settings.checkbox_mesh.setCheckState(
             Qt.Checked if self.mask_updater.show_mesh else Qt.Unchecked  # type: ignore
@@ -126,6 +135,18 @@ class ClippingSpline(SceneItem):
         self.regularization_filter = EditDoneEventFilter(change_regularization)
         self.ui_settings.edit_regularization.installEventFilter(
             self.regularization_filter
+        )
+
+        def change_upscale() -> None:
+            self.mask.set_upscale(validate_float(
+                self.ui_settings.edit_upscale.text(),
+                1., self._MAX_UPSCALE
+            ))
+            self.update_view()
+            self.attach_mask()
+        self.upscale_filter = EditDoneEventFilter(change_upscale)
+        self.ui_settings.edit_upscale.installEventFilter(
+            self.upscale_filter
         )
 
         def toggle_mesh(state: Qt.CheckState) -> None:
@@ -227,6 +248,7 @@ class ClippingSpline(SceneItem):
         struct["axis"] = self.mask.axis
         struct["keep_greater_than"] = self.mask.keep_greater_than
         struct["smoothing"] = self.mask.regularization
+        struct["upscale"] = self.mask.upscale
         struct["show_mesh"] = self.mask_updater.show_mesh
         return struct
 
@@ -243,6 +265,7 @@ class ClippingSpline(SceneItem):
         axis = load_int("axis", struct, errors, min_=0, max_=2)
         keep_greater_than = load_bool("keep_greater_than", struct, errors)
         regularization = load_float("smoothing", struct, errors, min_=0)
+        upscale = load_float("smoothing", struct, errors, min_=1, max_=self._MAX_UPSCALE)
         show_mesh = load_bool("show_mesh", struct, errors)
 
         if len(errors) > 0:
@@ -251,6 +274,7 @@ class ClippingSpline(SceneItem):
         self.mask.set_axis(axis)
         self.mask.set_direction(keep_greater_than)
         self.mask.set_regularization(regularization)
+        self.mask.set_upscale(upscale)
         self.mask_updater.show_mesh = show_mesh
 
         self.update_view()

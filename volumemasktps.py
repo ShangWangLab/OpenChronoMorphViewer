@@ -62,6 +62,7 @@ class VolumeMaskTPS:
         self.axis: int = 0
         self.keep_greater_than: bool = False
         self.regularization: float = 0.
+        self.upscale: float = 1.
         # The list of control points associated with the UI.
         self.control_points: list[ControlPoint] = []
         # The Nx3 array of points in world space that control the surface.
@@ -137,7 +138,7 @@ class VolumeMaskTPS:
                 logger.debug("set_direction deemed unnecessary.")
 
     def set_regularization(self, regularization: float) -> None:
-        """Update the regularization parameter and update the dirtiness.
+        """Update the regularization parameter and the dirtiness.
 
         Regularization "alpha" or "lambda" varies from [0.0-1.0] and
         determines now closely to track the control points vs. how smoothly
@@ -154,6 +155,25 @@ class VolumeMaskTPS:
                 self._reduce_progress(MaskUpdate.PARTIAL)
             else:
                 logger.debug("set_regularization deemed unnecessary.")
+
+    def set_upscale(self, upscale: float) -> None:
+        """Update the up-scale parameter and the dirtiness.
+
+        Up-scale is a number ranging from 1 to infinity. It determines the size
+        of the mask relative to the size of the volume, as mask = volume/upscale.
+        This is rounded so that the mask cannot have zero width no matter how
+        large up-scale is.
+
+        Thread safe.
+        """
+
+        with self.lock:
+            logger.debug(f"set_upscale({upscale})")
+            if self.upscale != upscale:
+                self.upscale = upscale
+                self._reduce_progress(MaskUpdate.FULL)
+            else:
+                logger.debug("set_upscale deemed unnecessary.")
 
     def _independent_axes(self) -> npt.NDArray[np.int_]:
         """Get the two remaining axes perpendicular to self.axis.
@@ -412,40 +432,42 @@ class VolumeMaskTPS:
             # Make copies of variables to prevent them from changing during
             # thread operation.
             mask_update = self._mask_update
+            if mask_update == MaskUpdate.NONE:
+                logger.info("The mask doesn't need updating.")
+                return self.mask
             self._mask_update = MaskUpdate.NONE
-            v_dims = self.v_dims.copy()
+
+            v_dims_f = np.ceil(self.v_dims.astype(np.float32) / self.upscale)
+            v_dims = v_dims_f.astype(np.uint64)
+            # Since we adjusted the dims, the scale needs to be larger too.
+            # We would just multiply by `upscale`, but this avoids rounding error.
+            v_scale = self.v_scale * (self.v_dims.astype(np.float32) / v_dims_f)
             axis = self.axis
             a_offset = self.v_offset[axis]
-            a_scale = self.v_scale[axis]
-            a_dim = self.v_dims[axis]
+            a_scale = v_scale[axis]
+            a_dim = v_dims[axis]
 
             ia = self._independent_axes()
             i_ctrl = self.control_array[:, ia]
             # World coordinates.
             i_lower = self.v_offset[ia]
-            i_step = self.v_scale[ia]
-            i_dims = self.v_dims[ia]
+            i_step = v_scale[ia]
+            i_dims = v_dims[ia]
             i_upper = i_lower + i_step * i_dims
 
             # This operation is usually computationally cheap, and the other
             # thread will need this to be generated in any case.
             parameters = self._fit()
 
-        if mask_update == MaskUpdate.NONE:
-            logger.info("The mask doesn't need updating.")
-            return self.mask
-
         logger.info(f"Rebuilding the spline grid for axis {axis}...")
-
         a0, a1 = _make_grid_axes(i_lower, i_upper, i_dims)
         dep_var = _make_dep_var(a0, a1, parameters, i_ctrl)
-
         dep_indices = np.clip(
             ((dep_var - a_offset) / a_scale).astype(np.int_),
             0, a_dim
         )
 
-        if self.keep_greater_than:  # Only accessed once; thread safe.
+        if self.keep_greater_than:  # Only accessed once; is thread safe.
             fill_below = np.uint8(0)  # Transparent
             fill_above = np.uint8(255)  # Opaque
         else:
