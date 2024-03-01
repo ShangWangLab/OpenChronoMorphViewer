@@ -130,8 +130,7 @@ class MainWindow(QMainWindow):
             self,                                                    # Parent.
             "Select one or more volumes to load",                    # Caption.
             self.CWD_path,                                           # Current working directory.
-            "Nearly Raw Raster Data (*.nrrd;*.nhdr);;Any File (*)")  # File filter options.
-
+            "Nearly Raw Raster Data (*.nrrd *.nhdr);;Any file (*)")  # File filter options.
         if not file_paths:
             return
 
@@ -145,7 +144,6 @@ class MainWindow(QMainWindow):
             0,                             # Minimum progress value.
             len(file_paths),               # Maximum progress value.
             self)  # Parent.
-
         progress_bar.setWindowModality(Qt.WindowModal)  # type: ignore
         progress_bar.setWindowTitle("Checking files")
         # Show the dialog if loading takes longer than x ms. The default is
@@ -199,7 +197,7 @@ class MainWindow(QMainWindow):
             self,                                    # Parent.
             "Save keyframe",                         # Caption.
             default_path,                            # File/directory.
-            "Keyframe File (*.json);;Any File (*)")  # File filter options.
+            "Keyframe File (*.json);;Any file (*)")  # File filter options.
         if not file_path:
             return
         self.scene.save_to_file(file_path, keyframe=True)
@@ -216,7 +214,7 @@ class MainWindow(QMainWindow):
             self,                                 # Parent.
             "Load scene",                         # Caption.
             default_dir,                          # Directory.
-            "Scene File (*.json);;Any File (*)")  # File filter options.
+            "Scene File (*.json);;Any file (*)")  # File filter options.
         if not file_path:
             return
         self.scene.load_from_file(file_path)
@@ -228,7 +226,7 @@ class MainWindow(QMainWindow):
             self,  # Parent.
             "Save image",  # Caption.
             self.CWD_path,  # Directory.
-            "PNG image (*.png);;TIFF image (*.tiff);;JPEG image (*.jpg)")  # File filter options.
+            "PNG image (*.png);;TIFF image (*.tif *.tiff);;JPEG image (*.jpg *.jpeg)")  # File filter options.
         if not file_path:
             return
         # Update the current directory in case they save another file.

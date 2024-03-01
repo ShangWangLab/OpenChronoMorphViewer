@@ -24,7 +24,7 @@ This project may not be a good fit if you need to:
 
 Required software:
 - [Python](https://www.python.org/downloads) version 3.11.4
-- [FFMPEG](https://ffmpeg.org/download.html) (only required for animating videos)
+- [FFMPEG](https://ffmpeg.org/download.html) version 6.1.1 (only required for animating videos)
 
 Required 3rd party Python packages:
 - NumPy 1.25.2 for 3D data operations
@@ -34,7 +34,7 @@ Required 3rd party Python packages:
 - SciPy 1.11.1 for the "cdist" function
 - PyVTK 9.2.6 for volumetric rendering
 
-See [dependency-install.bat](dependency-install.bat) for an example of the command to install all the Python dependencies.
+See [dependency-install-Windows.bat](dependency-install-Windows.bat) for an example of the command to install all the Python dependencies.
 
 ## Supported file formats
 

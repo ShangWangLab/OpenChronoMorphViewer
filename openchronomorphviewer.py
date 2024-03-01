@@ -1,3 +1,5 @@
+#!/usr/bin/python3.11
+
 """Main function file for the 4D viewer application.
 
 This was originally developed to load large 3D volumes captured using an
@@ -13,6 +15,13 @@ Required 3rd party packages:
 * PyQt5 5.15.2.2.3 - for the user interface
 * SciPy 1.11.1 - for the "cdist" function
 * PyVTK 9.2.6 - for volumetric rendering
+
+Required 3rd party software:
+* FFmpeg 6.1.1 (and added to PATH) - for compiling animation videos
+
+Tested on:
+* Window 10 and 11
+* macOS 12.6.0
 """
 
 import logging

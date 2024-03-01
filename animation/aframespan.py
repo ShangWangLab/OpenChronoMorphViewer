@@ -486,7 +486,6 @@ class AFrameSpan:
     #             scene.control_points.append(cpx)
     #         frames[i].apply_scene(scene)
 
-
     # noinspection PyPep8Naming
     def interpolate_cp_cyclic(
             self,

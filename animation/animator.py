@@ -1,4 +1,5 @@
 import os
+import subprocess
 from typing import (
     Callable,
     Optional,
@@ -156,7 +157,7 @@ class Animator:
             os.remove(video_path)
             assert not os.path.exists(video_path), f"Can't overwrite the video at '{video_path}'."
 
-        command = " ".join([
+        command = [
             "ffmpeg",
             f"-r {self.frame_rate:f}",
             f"-start_number 0",
@@ -166,11 +167,15 @@ class Animator:
             f"-crf {compression_level}",
             "-vf format=yuv420p",
             f'"{video_path}"'
-        ])
+        ]
 
-        print(command)
-        status: int = os.system(command)
-        assert status == 0, "Video conversion failed."
+        print(command[0])
+        for line in command[1:]:
+            print("/t" + line)
+        status: int = subprocess.call(command)
+        if status == 127:
+            print("FFmpeg cannot be found. Please add it to the PATH.")
+        assert status == 0, f"Video conversion failed: status={status}."
 
 
 def name_is_nrrd(name: str) -> bool:
