@@ -144,16 +144,16 @@ class Timeline:
             logger.debug(f"Removing index {i} at {volumes[i].path}")
             del volumes[i]
 
-        # Sort volumes increasing first by scan index, the slow time axis.
-        volumes.sort(key=lambda vol: (vol.scan_index, vol.time_index))
+        # Sort volumes increasing first by group index, the slow time axis.
+        volumes.sort(key=lambda vol: (vol.group_index, vol.time_index))
 
         # Compute the time integral and label the volumes.
-        scan_index: Optional[int] = None
+        group_index: Optional[int] = None
         time_sum: float = 0
         for i, v in enumerate(volumes):
-            if v.scan_index != scan_index:
-                scan_index = v.scan_index
-                # Times are accumulated only for each scan.
+            if v.group_index != group_index:
+                group_index = v.group_index
+                # Times are accumulated only for each group.
                 time_sum = 0
             v.make_label(time_sum, i, len(volumes))
             time_sum += v.period
@@ -241,7 +241,7 @@ class Timeline:
                 memory_recovered = v.estimate_memory()
                 v.unload()
                 self.memory_used -= memory_recovered
-                logger_load.debug(f"Unloaded volume S{v.scan_index}T{v.time_index} \
+                logger_load.debug(f"Unloaded volume G{v.group_index}T{v.time_index} \
 last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes.")
 
             error_message = vol.load()
@@ -259,21 +259,21 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
             v.unload()
             self.memory_used -= v.estimate_memory()
 
-    def get_prev_scan_index(self) -> int:
-        """The index of the volume with a scan index less than the current scan
+    def get_prev_group_index(self) -> int:
+        """The index of the volume with a group index less than the current group
         index and the closest matching phase. The lower index breaks ties."""
 
         assert self, "You need to call set_file_paths first."
 
         i = self.index
-        scan_index = self.volumes[i].scan_index
+        group_index = self.volumes[i].group_index
         phase = self.volumes[i].get_phase()
-        while i > 0 and scan_index == self.volumes[i].scan_index:
+        while i > 0 and group_index == self.volumes[i].group_index:
             i -= 1
-        scan_index = self.volumes[i].scan_index
+        group_index = self.volumes[i].group_index
         smallest_diff: float = 1.
         i_best: int = i
-        while i >= 0 and scan_index == self.volumes[i].scan_index:
+        while i >= 0 and group_index == self.volumes[i].group_index:
             diff: float = abs(phase - self.volumes[i].get_phase())
             if diff > 0.5:
                 diff = 1 - diff
@@ -281,34 +281,34 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 smallest_diff = diff
                 i_best = i
             i -= 1
-        logger.debug(f"Prev. to scan index {scan_index} from i = {self.index} to {i_best} and phase = "
+        logger.debug(f"Prev. to group index {group_index} from i = {self.index} to {i_best} and phase = "
                      f"{phase} to best match of {self.volumes[i_best].get_phase()}")
         return i_best
 
-    def get_next_scan_index(self) -> int:
-        """The index of the volume with a scan index less than the current scan
+    def get_next_group_index(self) -> int:
+        """The index of the volume with a group index less than the current group
         index and the closest matching phase, if available, otherwise the
         lowest-indexed volume.
 
-        The index of the first volume with a scan index greater than
-        the current scan index.
+        The index of the first volume with a group index greater than the
+        current group index.
 
-        This method is intended to be called when skipping around the
-        timeline from one scan to the next.
+        This method is intended to be called when skipping around the timeline
+        from one group to the next.
         """
 
         assert self, "You need to call set_file_paths first."
 
         i = self.index
-        scan_index = self.volumes[i].scan_index
+        group_index = self.volumes[i].group_index
         phase = self.volumes[i].get_phase()
         i_max = len(self.volumes) - 1
-        while i < i_max and scan_index == self.volumes[i].scan_index:
+        while i < i_max and group_index == self.volumes[i].group_index:
             i += 1
-        scan_index = self.volumes[i].scan_index
+        group_index = self.volumes[i].group_index
         smallest_diff: float = 1.
         i_best: int = i
-        while i <= i_max and scan_index == self.volumes[i].scan_index:
+        while i <= i_max and group_index == self.volumes[i].group_index:
             diff: float = abs(phase - self.volumes[i].get_phase())
             if diff > 0.5:
                 diff = 1 - diff
@@ -316,38 +316,38 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 smallest_diff = diff
                 i_best = i
             i += 1
-        logger.debug(f"Next to scan index {scan_index} from i = {self.index} to {i_best} and phase = "
+        logger.debug(f"Next to group index {group_index} from i = {self.index} to {i_best} and phase = "
                      f"{phase} to best match of {self.volumes[i_best].get_phase()}")
         return i_best
 
-    def get_first_scan_index(self) -> int:
-        """The lowest index of the volume with a scan index equal to the current scan."""
+    def get_first_group_index(self) -> int:
+        """The lowest index of the volume with a group index equal to the current group."""
 
         assert self, "You need to call set_file_paths first."
 
         # It's good practice to make a local copy of the current index so
         # the other threads can't change it in the middle of the operation.
         i = self.index
-        scan_index = self.volumes[i].scan_index
-        while i > 0 and scan_index == self.volumes[i-1].scan_index:
+        group_index = self.volumes[i].group_index
+        while i > 0 and group_index == self.volumes[i-1].group_index:
             i -= 1
-        logger.debug(f"First to scan index {scan_index} from i = {self.index} to {i}, "
-                     f"S{self.volumes[i].scan_index}T{self.volumes[i].time_index}")
+        logger.debug(f"First to group index {group_index} from i = {self.index} to {i}, "
+                     f"G{self.volumes[i].group_index}T{self.volumes[i].time_index}")
         return i
 
-    def get_last_scan_index(self) -> int:
-        """The highest index of the volume with a scan index equal to the current scan."""
+    def get_last_group_index(self) -> int:
+        """The highest index of the volume with a group index equal to the current group."""
 
         assert self, "You need to call set_file_paths first."
 
         # It's good practice to make a local copy of the current index so
         # the other threads can't change it in the middle of the operation.
         i = self.index
-        scan_index = self.volumes[i].scan_index
-        while i < len(self.volumes) - 1 and scan_index == self.volumes[i+1].scan_index:
+        group_index = self.volumes[i].group_index
+        while i < len(self.volumes) - 1 and group_index == self.volumes[i+1].group_index:
             i += 1
-        logger.debug(f"Last to scan index {scan_index} from i = {self.index} to {i}, "
-                     f"S{self.volumes[i].scan_index}T{self.volumes[i].time_index}")
+        logger.debug(f"Last to group index {group_index} from i = {self.index} to {i}, "
+                     f"G{self.volumes[i].group_index}T{self.volumes[i].time_index}")
         return i
 
     def _make_cache_priorities(self) -> None:
@@ -530,26 +530,26 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
         assert self, "You need to call set_file_paths first."
         return self.volumes[self.index].get_view_scale()
 
-    def get_scan_lengths(self) -> list[int]:
-        """Count the number of volumes for each scan in the timeline.
+    def get_group_lengths(self) -> list[int]:
+        """Count the number of volumes for each group in the timeline.
 
-        :return: A list of the number of volumes in each sequential scan.
+        :return: A list of the number of volumes in each sequential group.
             Example: [70, 70, 73, 66, ...]
         """
 
-        scan_lengths: list[int] = []
+        group_lengths: list[int] = []
         with self.load_lock:
             if not self:
-                return scan_lengths
+                return group_lengths
 
-            last_scan_index = self.volumes[0].scan_index
+            last_group_index = self.volumes[0].group_index
             last_len: int = 1
             for v in self.volumes[1:]:
-                if last_scan_index != v.scan_index:
-                    scan_lengths.append(last_len)
-                    last_scan_index = v.scan_index
+                if last_group_index != v.group_index:
+                    group_lengths.append(last_len)
+                    last_group_index = v.group_index
                     last_len = 0
                 last_len += 1
         if last_len > 0:
-            scan_lengths.append(last_len)
-        return scan_lengths
+            group_lengths.append(last_len)
+        return group_lengths

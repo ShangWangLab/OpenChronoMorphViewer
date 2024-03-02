@@ -448,16 +448,16 @@ you'll have no way to get another!")
         if keyframe:
             # Keyframes need some additional data about the volume.
             if self.last_volume is None:
-                scan_index = None
+                group_index = None
                 time_index = None
                 n_times = None
             else:
-                scan_index = self.last_volume.scan_index
+                group_index = self.last_volume.group_index
                 time_index = self.last_volume.time_index
                 n_times = self.last_volume.n_times
             struct.append({
                 "type": "VolumeInfo",
-                "scan_index": scan_index,
+                "group_index": group_index,
                 "time_index": time_index,
                 "n_times": n_times,
             })

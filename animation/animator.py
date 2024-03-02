@@ -142,7 +142,7 @@ class Animator:
             # loaded into memory once.
             def frame_key(frame_index: int) -> tuple[int, int]:
                 v = self.a_frames[frame_index].volume
-                return v.scan_index, v.time_index
+                return v.group_index, v.time_index
             aframe_indices.sort(key=frame_key)
         for progress, i in enumerate(aframe_indices):
             path_out = os.path.join(self.dir_out_path, f"frame{i:06d}.png")

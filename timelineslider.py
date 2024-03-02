@@ -49,18 +49,18 @@ class TimelineSlider:
         self._update_label()
 
     def _get_style_sheet(self) -> str:
-        """Make the slider style sheet to highlight different scans in alternating tones.
+        """Make the slider style sheet to highlight different groups in alternating tones.
 
         An alternating style sheet is only produced when there are at least two
-        volumes in the timeline which share a scan. Otherwise, the empty style
+        volumes in the timeline which share a group. Otherwise, the empty style
         sheet is returned.
 
-        "Singletons", i.e., volumes which are the only examples of their scan
+        "Singletons", i.e., volumes which are the only examples of their group
         index, are consolidated with their neighbors to form blocks. This
         prevents lots of alternating colors when unrelated volumes are loaded.
         """
 
-        s_lens = self.timeline.get_scan_lengths()
+        s_lens = self.timeline.get_group_lengths()
         s_lens = _consolidate_ones(s_lens)
         if len(s_lens) < 2:
             return ""  # The default style sheet.
@@ -137,8 +137,8 @@ class TimelineSlider:
         self.ui.slider_timeline.valueChanged.connect(self.set_index)
         self.ui.edit_goto_time.returnPressed.connect(self._on_goto)
         self.ui.button_goto_time.clicked.connect(self._on_goto)
-        self.ui.button_prev.clicked.connect(self._on_prev_scan)
-        self.ui.button_next.clicked.connect(self._on_next_scan)
+        self.ui.button_prev.clicked.connect(self._on_prev_group)
+        self.ui.button_next.clicked.connect(self._on_next_group)
 
         # We need to keep this variable around or the garbage collector will
         # collect it.
@@ -154,14 +154,14 @@ class TimelineSlider:
         self.ui.action_next_volume.setShortcut("right")
         self.ui.action_prev_volume.triggered.connect(lambda _: self.add(-1))
         self.ui.action_prev_volume.setShortcut("left")
-        self.ui.action_next_sequence.triggered.connect(self._on_next_scan)
+        self.ui.action_next_sequence.triggered.connect(self._on_next_group)
         self.ui.action_next_sequence.setShortcut("page down")
-        self.ui.action_prev_sequence.triggered.connect(self._on_prev_scan)
+        self.ui.action_prev_sequence.triggered.connect(self._on_prev_group)
         self.ui.action_prev_sequence.setShortcut("page up")
 
-        self.ui.action_start_of_sequence.triggered.connect(self._goto_scan_start)
+        self.ui.action_start_of_sequence.triggered.connect(self._goto_group_start)
         self.ui.action_start_of_sequence.setShortcut(",")
-        self.ui.action_end_of_sequence.triggered.connect(self._goto_scan_end)
+        self.ui.action_end_of_sequence.triggered.connect(self._goto_group_end)
         self.ui.action_end_of_sequence.setShortcut(".")
 
     def set_index(self, index: int) -> None:
@@ -197,8 +197,8 @@ class TimelineSlider:
         p = self.ui.slider_timeline.sliderPosition()
         p_next = (p + delta) % slider_n
 
-        i0: int = self.timeline.get_first_scan_index()
-        i1: int = self.timeline.get_last_scan_index()
+        i0: int = self.timeline.get_first_group_index()
+        i1: int = self.timeline.get_last_group_index()
         logger.debug(
             f"Add {delta} to {p}. Bounds: {i0} to {i1}. Cycles: {self.cycles_remaining}/{self.n_cycles}")
 
@@ -221,7 +221,7 @@ class TimelineSlider:
         self.set_index(p_next)
 
     def _on_goto(self, _: Any = None) -> None:
-        """Respond to the "go-to" button event."""
+        """Respond to the "go to" button event."""
 
         if not self.timeline:
             return
@@ -232,40 +232,40 @@ class TimelineSlider:
         self.set_index(index - 1)
         self.cycles_remaining = self.n_cycles
 
-    def _on_prev_scan(self, _: Any = None) -> None:
-        """Respond to the "previous scan" button event."""
+    def _on_prev_group(self, _: Any = None) -> None:
+        """Respond to the "previous group" button event."""
 
         if not self.timeline:
             return
 
-        self.set_index(self.timeline.get_prev_scan_index())
+        self.set_index(self.timeline.get_prev_group_index())
         self.cycles_remaining = self.n_cycles
 
-    def _on_next_scan(self, _: Any = None) -> None:
-        """Respond to the "next scan" button event."""
+    def _on_next_group(self, _: Any = None) -> None:
+        """Respond to the "next group" button event."""
 
         if not self.timeline:
             return
 
-        self.set_index(self.timeline.get_next_scan_index())
+        self.set_index(self.timeline.get_next_group_index())
         self.cycles_remaining = self.n_cycles
 
-    def _goto_scan_start(self, _: Any = None) -> None:
-        """Respond to a key event, jumping to the beginning of the current scan."""
+    def _goto_group_start(self, _: Any = None) -> None:
+        """Respond to a key event, jumping to the beginning of the current group."""
 
         if not self.timeline:
             return
 
-        self.set_index(self.timeline.get_first_scan_index())
+        self.set_index(self.timeline.get_first_group_index())
         self.cycles_remaining = self.n_cycles
 
-    def _goto_scan_end(self, _: Any = None) -> None:
-        """Respond to a key event, jumping to the end of the current scan."""
+    def _goto_group_end(self, _: Any = None) -> None:
+        """Respond to a key event, jumping to the end of the current group."""
 
         if not self.timeline:
             return
 
-        self.set_index(self.timeline.get_last_scan_index())
+        self.set_index(self.timeline.get_last_group_index())
         self.cycles_remaining = self.n_cycles
 
 

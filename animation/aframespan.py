@@ -177,7 +177,7 @@ class AFrameSpan:
             self,
             parameters: list[float],
             keyframes: list[AScene],
-            scan_const: bool = False):
+            group_const: bool = False):
         """Interpolate the cameras passed and apply them to the animation frames.
 
         The interpolation is spline-based, using the default VTK camera interpolator,
@@ -185,11 +185,11 @@ class AFrameSpan:
 
         :param parameters: Represents the fraction of the interpolation at which
             each keyframe occurs. A value of 0 corresponds to the first animation
-            frame, while a value of 1 corresponds to the last frame (or scan,
-            in the case of scan_const=True).
+            frame, while a value of 1 corresponds to the last frame (or group,
+            in the case of group_const=True).
         :param keyframes: The list of scenes to interpolate cameras between.
-        :param scan_const: When true, interpolations goes from scan to
-            scan, ignoring the cycles in between.
+        :param group_const: When true, interpolations goes from group to
+            group, ignoring the cycles in between.
         """
 
         assert len(self) > 1, \
@@ -208,15 +208,15 @@ class AFrameSpan:
             model.AddCamera(parameters[i], camera)
 
         orthographic_mode: bool = keyframes[0].items["Camera"]["orthographic"]
-        if scan_const:
-            t0 = min(f.volume.scan_index for f in self.a_frames)
-            t1 = max(f.volume.scan_index for f in self.a_frames)
+        if group_const:
+            t0 = min(f.volume.group_index for f in self.a_frames)
+            t1 = max(f.volume.group_index for f in self.a_frames)
         else:
             t0 = 0
             t1 = len(self.a_frames) - 1
         for i, frame in enumerate(self.a_frames):
-            if scan_const:
-                t = (frame.volume.scan_index - t0) / (t1 - t0)
+            if group_const:
+                t = (frame.volume.group_index - t0) / (t1 - t0)
             else:
                 t = i / t1
             camera = vtkCamera()
@@ -228,18 +228,18 @@ class AFrameSpan:
             self,
             parameters: list[float],
             keyframes: list[AScene],
-            scan_const: bool = False,
+            group_const: bool = False,
             spline: bool = True,
             end_continuity: int = 0) -> None:
         """Interpolate the channels passed and apply them to the animation frames.
 
         :param parameters: Represents the fraction of the interpolation at which
             each keyframe occurs. A value of 0 corresponds to the first animation
-            frame, while a value of 1 corresponds to the last frame (or scan,
-            in the case of scan_const=True).
+            frame, while a value of 1 corresponds to the last frame (or group,
+            in the case of group_const=True).
         :param keyframes: The list of scenes to interpolate channel values between.
-        :param scan_const: When true, interpolations goes from scan to
-            scan, ignoring the cycles in between.
+        :param group_const: When true, interpolations goes from group to
+            group, ignoring the cycles in between.
         :param spline: When true, use a spline for interpolation, otherwise, use
             piecewise linear interpolation.
         :param end_continuity: The degree of continuity to enforce between the
@@ -298,18 +298,18 @@ class AFrameSpan:
             self,
             parameters: list[float],
             keyframes: list[AScene],
-            scan_const: bool = False,
+            group_const: bool = False,
             spline: bool = True,
             end_continuity: int = 0) -> None:
         """Interpolate the clipping planes passed and apply them to the animation frames.
 
         :param parameters: Represents the fraction of the interpolation at which
             each keyframe occurs. A value of 0 corresponds to the first animation
-            frame, while a value of 1 corresponds to the last frame (or scan,
-            in the case of scan_const=True).
+            frame, while a value of 1 corresponds to the last frame (or group,
+            in the case of group_const=True).
         :param keyframes: The list of scenes to interpolate planes between.
-        :param scan_const: When true, interpolations goes from scan to
-            scan, ignoring the cycles in between.
+        :param group_const: When true, interpolations goes from group to
+            group, ignoring the cycles in between.
         :param spline: When true, use a spline for interpolation, otherwise, use
             piecewise linear interpolation.
         :param end_continuity: The degree of continuity to enforce between the
@@ -372,23 +372,23 @@ class AFrameSpan:
             self,
             parameters: list[float],
             keyframes: list[AScene],
-            scan_const: bool = False,
+            group_const: bool = False,
             spline: bool = True,
             smoothness: float = 0,
             end_continuity: int = 0) -> None:
         """Interpolate the control points passed and apply them to the animation
         frames.
 
-        TODO: Missing spline functionality and missing respect for the scan_const
+        TODO: Missing spline functionality and missing respect for the group_const
             parameter, along with proper integration of end_continuity.
 
         :param parameters: Represents the fraction of the interpolation at which
             each keyframe occurs. A value of 0 corresponds to the first animation
-            frame, while a value of 1 corresponds to the last frame (or scan,
-            in the case of scan_const=True).
+            frame, while a value of 1 corresponds to the last frame (or group,
+            in the case of group_const=True).
         :param keyframes: The list of scenes to interpolate control points between.
-        :param scan_const: When true, interpolations goes from scan to
-            scan, ignoring the cycles in between.
+        :param group_const: When true, interpolations goes from group to
+            group, ignoring the cycles in between.
         :param spline: When true, use a spline for interpolation, otherwise, use
             piecewise linear interpolation.
         :param end_continuity: The degree of continuity to enforce between the
@@ -491,7 +491,7 @@ class AFrameSpan:
             self,
             keyframes: list[AScene],
             smoothness: float = 0.,
-            scan_specificity: float = 1.) -> tuple[CylinderSpline, np.ndarray, np.ndarray]:
+            group_specificity: float = 1.) -> tuple[CylinderSpline, np.ndarray, np.ndarray]:
         """Perform a 2D thin-plate spline fit in a cylindrical coordinate
         system to interpolate the control points smoothly both around cycles and
         between cycles.
@@ -504,9 +504,9 @@ class AFrameSpan:
         :param smoothness: The amount of regularization to use. The amplitude
             should usually be in range [0-1], but larger is valid. A smoothness
             of 0 corresponds to exactly intersecting each control point.
-        :param scan_specificity: The aspect ratio of the coordinate system.
-            Increasing this value relaxes the curve between scan, decreasing
-            the tendency to generalize between adjacent cycles.
+        :param group_specificity: The aspect ratio of the coordinate system.
+            Increasing this value relaxes the curve between groups, decreasing
+            the tendency to generalize across groups, aka, cycles.
         :return: The thin-plate spline object which can be used to evaluate the
             control points at additional locations, the input point array
             derived from the keyframes (X), and the output control points
@@ -522,33 +522,33 @@ class AFrameSpan:
             "All keyframes must have a matching set of control points."
         cps = copy.deepcopy(keyframes[0].control_points)
 
-        # We need to resize the scan indices and the time indices onto a
-        # common scale from [0-1]. Unfortunately, the max and min scan indices
+        # We need to resize the group indices and the time indices onto a
+        # common scale from [0-1]. Unfortunately, the max and min group indices
         # are not generally known, so we rescale based on the given batch.
-        all_scan_indices = (
-            [kf.items["VolumeInfo"]["scan_index"] for kf in keyframes]
-            + [f.volume.scan_index for f in self.a_frames]
+        all_group_indices = (
+            [kf.items["VolumeInfo"]["group_index"] for kf in keyframes]
+            + [f.volume.group_index for f in self.a_frames]
         )
-        min_scan_index: int = min(all_scan_indices)
-        range_scan_index: int = max(all_scan_indices) - min_scan_index
+        min_group_index: int = min(all_group_indices)
+        range_group_index: int = max(all_group_indices) - min_group_index
 
         X_fit = np.empty((n_kf, 2))
         Y_fit = np.empty((n_kf, 3 * n_cp))
 
         for i, kf in enumerate(keyframes):
             info = kf.items["VolumeInfo"]
-            X_fit[i, 0] = (info["scan_index"] - min_scan_index) / range_scan_index
+            X_fit[i, 0] = (info["group_index"] - min_group_index) / range_group_index
             X_fit[i, 1] = info["time_index"] / info["n_times"]
             for j in range(n_cp):
                 Y_fit[i, 3*j:3*(j+1)] = kf.control_points[j]["origin"]
 
-        spline = CylinderSpline(smoothness, scan_specificity)
+        spline = CylinderSpline(smoothness, group_specificity)
         spline.fit(X_fit, Y_fit)
 
         X_out = np.empty((len(self), 2))
         for i, f in enumerate(self.a_frames):
             v: VolumeImage = f.volume
-            X_out[i, 0] = (v.scan_index - min_scan_index) / range_scan_index
+            X_out[i, 0] = (v.group_index - min_group_index) / range_group_index
             X_out[i, 1] = v.time_index / v.n_times
         Y_out = spline.transform(X_out)
 

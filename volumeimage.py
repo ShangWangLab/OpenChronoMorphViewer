@@ -60,7 +60,7 @@ class VolumeImage:
         self.period: float = 1.
         self.period_unit: str = "sec"
         self.timestamp: Optional[str] = None
-        self.scan_index: int = 0
+        self.group_index: int = 0
         self.time_index: int = 0
         self.n_times: int = 1
 
@@ -129,20 +129,27 @@ class VolumeImage:
             if "space origin" in header:
                 self.origin = header["space origin"]
 
-            # Custom fields. 5D datasets have a slow and a fast time axis. The
+            # Custom fields. 5D datasets have a slow and a fast time-axis. The
             # slow axis is the time between acquisition sessions, while the fast
             # axis is within a single acquisition.
 
-            # The slow time axis index.
+            # The slow time-axis index. "scan index" is deprecated;
+            # "group index" is the preferred field label.
             try:
-                self.scan_index = int(header["scan index"])
+                self.group_index = int(header["scan index"])
             except ValueError:
                 return FileError(f"Non-integer scan index", self.path)
             except KeyError:
                 pass
-            if self.scan_index < 0:
-                return FileError(f"Negative scan index", self.path)
-            # The fast time axis index.
+            try:
+                self.group_index = int(header["group index"])
+            except ValueError:
+                return FileError(f"Non-integer group index", self.path)
+            except KeyError:
+                pass
+            if self.group_index < 0:
+                return FileError(f"Negative group index", self.path)
+            # The fast time-axis index.
             try:
                 self.time_index = int(header["time index"])
             except ValueError:
@@ -151,17 +158,17 @@ class VolumeImage:
                 pass
             if self.time_index < 0:
                 return FileError(f"Negative time index", self.path)
-            # How many fast time points are associated with this slow time
+            # How many fast timepoints are associated with this slow time
             # point.
             try:
                 self.n_times = int(header["n times"])
             except ValueError:
-                return FileError(f"Non-integer number of time points", self.path)
+                return FileError(f"Non-integer number of timepoints", self.path)
             except KeyError:
                 pass
             if self.n_times < 1:
-                return FileError(f"Non-positive number of time points (need at least one)", self.path)
-            # The slow time axis. The number of minutes since the initial
+                return FileError(f"Non-positive number of timepoints (need at least one)", self.path)
+            # The slow time-axis. The number of minutes since the initial
             # acquisition.
             try:
                 self.timestamp = header["timestamp"]
@@ -169,13 +176,13 @@ class VolumeImage:
                 pass
             if self.timestamp is not None and len(self.timestamp) > 20:
                 return FileError(f"Excessively long timestamp ({len(self.timestamp)} characters)", self.path)
-            # The length of the short time axis. How long between this volume
+            # The length of the short time-axis. How long between this volume
             # acquisition and the next. This is usually constant within a series
             # of acquisitions, and especially within an acquisition.
             try:
                 self.period = float(header["period"])
             except ValueError:
-                return FileError(f"Non-numeric scan period", self.path)
+                return FileError(f"Non-numeric t1 sample period", self.path)
             except KeyError:
                 pass
             if self.period < 0 or math.isnan(self.period) or math.isinf(self.period):
@@ -187,11 +194,8 @@ class VolumeImage:
             if len(self.period_unit) > 20:
                 return FileError(
                     f"Excessively long period unit ({len(self.period_unit)} characters)", self.path)
-            # Set this at the end so
             self.header = header
-
-            # No error message to report.
-            return None
+            return None  # No error message to report.
         except Exception as e:
             return FileError(f"Uncaught error while parsing header: {e}", self.path)
 
@@ -330,7 +334,7 @@ class VolumeImage:
         return self.image is not None
 
     def get_phase(self) -> float:
-        """Calculate the fraction of the cycle this time point represents."""
+        """Calculate the fraction of the cycle this timepoint represents."""
 
         return self.time_index / self.n_times
 
@@ -342,7 +346,7 @@ class VolumeImage:
         :param n_volumes: The total number of volume in the timeline.
         """
 
-        timestamp = str(self.scan_index)
+        timestamp = str(self.group_index)
         if self.timestamp is not None:
             timestamp += " (" + self.timestamp + ")"
 
