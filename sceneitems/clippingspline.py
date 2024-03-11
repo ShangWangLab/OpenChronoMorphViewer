@@ -265,7 +265,7 @@ class ClippingSpline(SceneItem):
         axis = load_int("axis", struct, errors, min_=0, max_=2)
         keep_greater_than = load_bool("keep_greater_than", struct, errors)
         regularization = load_float("smoothing", struct, errors, min_=0)
-        upscale = load_float("smoothing", struct, errors, min_=1, max_=self._MAX_UPSCALE)
+        upscale = load_float("upscale", struct, errors, min_=1, max_=self._MAX_UPSCALE)
         show_mesh = load_bool("show_mesh", struct, errors)
 
         if len(errors) > 0:
