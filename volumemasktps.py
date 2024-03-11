@@ -583,28 +583,24 @@ class VolumeMaskTPS:
             return self.vtk_data
 
 
-# noinspection PyPep8Naming
 def _radial_distance(
-        X: npt.NDArray[np.float32],
+        x: npt.NDArray[np.float32],
         ctrl_ind: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
     """Compute the pairwise radial distances of the given points to the
     control points.
 
     Definition:
-      phi(r) = r^2 * log(r)
-      Where "r" is the distance between the control point and the data point.
+        phi(r) = r^2 * log(r)
+        Where "r" is the distance between the control point and the data point.
 
-    Args:
-      X (array): n points in the source space. Shape: (n, 2)
-      ctrl_ind (array): n_c control points representing the independent
-      variables. Shape: (n_c, 2)
-
-    Returns:
-      array: The radial distance for each point to a control point
-      (phi(X)) Shape: (n, n_c)
+    :param x: (n, 2) matrix of points in the source space.
+    :param ctrl_ind: (n_c, 2) matrix of control points representing the
+        independent variables.
+    :return: phi is the (n, n_c) matrix of radial distance from each point to a
+        control point.
     """
 
-    dist_sq = cdist(X, ctrl_ind, metric="sqeuclidean")
+    dist_sq = cdist(x, ctrl_ind, metric="sqeuclidean")
     dist_sq = dist_sq.astype(np.float32)
     dist_sq[dist_sq == 0] = 1  # phi(0) = 0 by definition.
     return dist_sq * np.log(dist_sq) / 2
