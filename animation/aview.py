@@ -111,4 +111,6 @@ class AView:
         image_writer.SetFileName(file_path)
         image_writer.Write()
 
-        assert self.ren_win.GetSize() == self.win_size, "The render window has changed size unexpectedly."
+        assert self.ren_win.GetSize() == self.win_size, (
+            "The render window has changed size unexpectedly! "
+            "Do you have a large enough monitor for the video you are rendering?")
