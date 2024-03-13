@@ -159,23 +159,25 @@ class Animator:
 
         command = [
             "ffmpeg",
-            f"-r {self.frame_rate:f}",
-            f"-start_number 0",
-            f'-i "' + os.path.join(self.dir_out_path, "frame%06d.png") + '"',
-            f"-vframes {len(self.a_frames)}",
-            "-c:v libx26" + ("5" if h265 else "4"),
-            f"-crf {compression_level}",
-            "-vf format=yuv420p",
-            f'"{video_path}"'
+            "-r", str(self.frame_rate),
+            "-start_number", "0",
+            "-i", os.path.join(self.dir_out_path, "frame%06d.png"),
+            "-vframes", str(len(self.a_frames)),
+            "-c:v", "libx26" + ("5" if h265 else "4"),
+            "-crf", str(compression_level),
+            "-vf", "format=yuv420p",
+            video_path
         ]
 
-        print(command[0])
-        for line in command[1:]:
-            print("/t" + line)
-        status: int = subprocess.call(command)
-        if status == 127:
+        print(" ".join(command))
+        proc = subprocess.run(command, capture_output=True)
+        if proc.stdout:
+            print(proc.stdout.decode())
+        if proc.stderr:
+            print(proc.stderr.decode())
+        if proc.returncode == 127:
             print("FFmpeg cannot be found. Please add it to the PATH.")
-        assert status == 0, f"Video conversion failed: status={status}."
+        assert proc.returncode == 0, f"Video conversion failed: code {proc.returncode}."
 
 
 def name_is_nrrd(name: str) -> bool:
