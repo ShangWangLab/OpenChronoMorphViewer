@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>230</width>
+    <width>225</width>
     <height>638</height>
    </rect>
   </property>
@@ -46,6 +46,12 @@
      </item>
      <item>
       <widget class="QLineEdit" name="item_name">
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -57,6 +63,12 @@
     <layout class="QHBoxLayout" name="layout_creation_2">
      <item>
       <widget class="QPushButton" name="button_new_chan">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>+ New Chan.</string>
        </property>
@@ -64,6 +76,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="button_delete_chan">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Delete Chan.</string>
        </property>
@@ -80,12 +98,24 @@
      <item>
       <widget class="QLabel" name="label_transfer_func">
        <property name="text">
-        <string>Transfer func.</string>
+        <string>Transfer Func.</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QComboBox" name="select_transfer_func">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
        <item>
         <property name="text">
          <string>Linear</string>
@@ -114,6 +144,12 @@
       </property>
       <item>
        <widget class="QLineEdit" name="edit_opacity0">
+        <property name="minimumSize">
+         <size>
+          <width>10</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>0.0</string>
         </property>
@@ -131,6 +167,12 @@
       </item>
       <item>
        <widget class="QLineEdit" name="edit_opacity1">
+        <property name="minimumSize">
+         <size>
+          <width>10</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>25.0</string>
         </property>
@@ -163,6 +205,12 @@
       </property>
       <item>
        <widget class="QLineEdit" name="edit_range0">
+        <property name="minimumSize">
+         <size>
+          <width>10</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>0.0</string>
         </property>
@@ -180,6 +228,12 @@
       </item>
       <item>
        <widget class="QLineEdit" name="edit_range1">
+        <property name="minimumSize">
+         <size>
+          <width>10</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>100</string>
         </property>
@@ -200,6 +254,12 @@
    </item>
    <item>
     <widget class="QGraphicsView" name="graphic_transfer_func">
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -233,6 +293,12 @@
      </property>
      <item row="0" column="0">
       <widget class="QPushButton" name="button_color0">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="toolTip">
         <string>The &quot;low&quot; color for the leftmost node of the transfer function</string>
        </property>
@@ -243,6 +309,12 @@
      </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="button_color1">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="toolTip">
         <string>The color for central values (only for triangular)</string>
        </property>
@@ -253,6 +325,12 @@
      </item>
      <item row="2" column="0">
       <widget class="QPushButton" name="button_color2">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="toolTip">
         <string>The &quot;high&quot; color for the rightmost node of the transfer function</string>
        </property>

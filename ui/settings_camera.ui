@@ -61,61 +61,27 @@
      </property>
      <item row="1" column="0">
       <widget class="QLabel" name="label">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="text">
         <string>From</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="4">
-      <widget class="QLineEdit" name="edit_from_z">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>16777215</height>
-        </size>
-       </property>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_x">
        <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QLabel" name="label_z">
-       <property name="text">
-        <string>z</string>
+        <string>x</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="edit_from_x">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
+     <item row="2" column="4">
+      <widget class="QLineEdit" name="edit_to_y">
+       <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="layoutDirection">
@@ -129,7 +95,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="4">
       <widget class="QLabel" name="label_y">
        <property name="text">
         <string>y</string>
@@ -139,28 +105,38 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_x">
+     <item row="1" column="5">
+      <widget class="QLineEdit" name="edit_from_z">
+       <property name="minimumSize">
+        <size>
+         <width>10</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
-        <string>x</string>
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QLabel" name="label_z">
+       <property name="text">
+        <string>z</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
-     <item row="1" column="3">
+     <item row="1" column="4">
       <widget class="QLineEdit" name="edit_from_y">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="text">
@@ -173,29 +149,17 @@
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_to">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="text">
         <string>To</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="edit_to_x">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
+     <item row="1" column="2">
+      <widget class="QLineEdit" name="edit_from_x">
+       <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="layoutDirection">
@@ -209,43 +173,12 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QLineEdit" name="edit_to_y">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="4">
+     <item row="2" column="5">
       <widget class="QLineEdit" name="edit_to_z">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="layoutDirection">
@@ -258,6 +191,41 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLineEdit" name="edit_to_x">
+       <property name="minimumSize">
+        <size>
+         <width>10</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <spacer name="spacer_from">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -280,17 +248,33 @@
       </widget>
      </item>
      <item>
+      <spacer name="spacer_roll">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QLineEdit" name="edit_roll">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="text">
@@ -304,15 +288,15 @@
      <item>
       <widget class="QPushButton" name="button_roll_plus90">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>60</width>
-         <height>16777215</height>
+         <width>40</width>
+         <height>0</height>
         </size>
        </property>
        <property name="text">
@@ -323,15 +307,15 @@
      <item>
       <widget class="QPushButton" name="button_roll_minus90">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>60</width>
-         <height>16777215</height>
+         <width>40</width>
+         <height>0</height>
         </size>
        </property>
        <property name="text">
@@ -364,115 +348,79 @@
       </property>
       <item row="1" column="2">
        <widget class="QPushButton" name="button_z_minus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>55</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>Z-</string>
+         <string>-Z</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QPushButton" name="button_x_plus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>55</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>X+</string>
+         <string>+X</string>
         </property>
        </widget>
       </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="button_z_plus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>55</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>Z+</string>
+         <string>+Z</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="button_x_minus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>55</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>X-</string>
+         <string>-X</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="button_y_plus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>55</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>Y+</string>
+         <string>+Y</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QPushButton" name="button_y_minus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
-          <width>55</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>Y-</string>
+         <string>-Y</string>
         </property>
        </widget>
       </item>
@@ -498,23 +446,33 @@
       </widget>
      </item>
      <item>
+      <spacer name="spacer_projection">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>5</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QComboBox" name="select_projection">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>20</width>
          <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>110</width>
-         <height>16777215</height>
         </size>
        </property>
        <property name="focusPolicy">

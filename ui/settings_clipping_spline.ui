@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>240</width>
+    <width>211</width>
     <height>291</height>
    </rect>
   </property>
@@ -68,16 +68,10 @@
      </item>
      <item>
       <widget class="QComboBox" name="select_variable">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>100</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="focusPolicy">
@@ -131,10 +125,10 @@
      </item>
      <item>
       <widget class="QLineEdit" name="edit_regularization">
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
-         <width>16777215</width>
-         <height>16777215</height>
+         <width>10</width>
+         <height>0</height>
         </size>
        </property>
        <property name="toolTip">
@@ -164,6 +158,12 @@
      </item>
      <item>
       <widget class="QLineEdit" name="edit_upscale">
+       <property name="minimumSize">
+        <size>
+         <width>10</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="toolTip">
         <string>Values &gt;1 speed up mask generation at the cost of lower resolution.</string>
        </property>
