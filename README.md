@@ -20,6 +20,12 @@ This project may not be a good fit if you need to:
 - View extremely large volumes that do not fit into RAM.
 - Perform real-time data operations while visualizing.
 
+## Supported Platforms
+
+- Windows 10/11
+- Ubuntu 20.04+
+- macOS 13.0+ (experienced issues on version 10.9)
+
 ## Dependencies
 
 Required software:
@@ -42,7 +48,9 @@ OCMV is designed to load 3D volumes, each in a separate NRRD file. The files can
 
 ## License
 
-See the [LICENSE](LICENSE) for more information.
+[Open Chrono-Morph Viewer © 2024 by Andre C. Faubert is licensed under CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en)
+
+See [LICENSE](LICENSE) for the legal code.
 
 ## Contact
 
@@ -50,7 +58,7 @@ Please reach out to Andre Faubert (<afaubert@stevens.edu>) with any questions or
 
 ## Acknowledgements
 
-Funded by the National Institutes of Health (R01HD096335, R35GM142953).
+Funded by the National Institutes of Health (R35GM142953).
 
 A special thanks to our colleagues at [Dr. Shang Wang's Biophotonic's Lab]
 (https://www.shangwanglab.org/team)!
