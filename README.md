@@ -48,9 +48,10 @@ OCMV is designed to load 3D volumes, each in a separate NRRD file. The files can
 
 ## License
 
-[Open Chrono-Morph Viewer © 2024 by Andre C. Faubert is licensed under CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en)
+Open Chrono-Morph Viewer, a project for visualizing volumetric time-series.
+Copyright © 2024 Andre C. Faubert
 
-See [LICENSE](LICENSE) for the legal code.
+This work is published under GPLv3. See [LICENSE](LICENSE) for the legal code.
 
 ## Contact
 
