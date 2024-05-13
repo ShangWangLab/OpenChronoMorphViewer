@@ -19,13 +19,13 @@ from typing import Optional
 
 import psutil
 
-from eventfilter import EditDoneEventFilter
-from timeline import Timeline
-from ui.main_window import Ui_MainWindow
-from validatenumericinput import (
+from main.eventfilter import EditDoneEventFilter
+from main.timeline import Timeline
+from main.validatenumericinput import (
     nice_exp_format,
     validate_float,
 )
+from ui.main_window import Ui_MainWindow
 
 logger = logging.getLogger(__name__)
 

@@ -35,16 +35,16 @@ from vtkmodules.vtkRenderingCore import (
     vtkTextActor,
 )
 
-from errorreporter import ErrorReporter
-from eventfilter import EditDoneEventFilter
+from main.errorreporter import ErrorReporter
+from main.eventfilter import EditDoneEventFilter
 from sceneitems.sceneitem import SceneItem, load_bool, load_float
-from timeline import Timeline
+from main.timeline import Timeline
 from ui.settings_scale_bar import Ui_SettingsScaleBar
-from validatenumericinput import (
+from main.validatenumericinput import (
     nice_exp_format,
     validate_float,
 )
-from viewframe import ViewFrame
+from main.viewframe import ViewFrame
 
 logger = logging.getLogger(__name__)
 

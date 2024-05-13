@@ -36,7 +36,7 @@ from vtkmodules.vtkRenderingCore import (
 
 from animation.asceneitems.asceneitem import ASceneItem
 from sceneitems.sceneitem import load_float, load_bool
-from validatenumericinput import (
+from main.validatenumericinput import (
     nice_exp_format,
 )
 

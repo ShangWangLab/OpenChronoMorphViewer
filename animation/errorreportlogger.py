@@ -16,7 +16,7 @@
 
 import logging
 
-from errorreporter import FileError
+from main.errorreporter import FileError
 
 logger = logging.getLogger(__name__)
 

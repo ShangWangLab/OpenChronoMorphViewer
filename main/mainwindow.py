@@ -13,6 +13,45 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
 import os
@@ -26,14 +65,14 @@ from PyQt5.QtWidgets import (
     QShortcut,
 )
 
-from cachelimiter import CacheLimiter
-from errorreporter import ErrorReporter
-from scene import Scene
-from timeline import Timeline
-from timelineslider import TimelineSlider
+from main.cachelimiter import CacheLimiter
+from main.errorreporter import ErrorReporter
+from main.scene import Scene
+from main.timeline import Timeline
+from main.timelineslider import TimelineSlider
+from main.viewframe import ViewFrame
+from main.volumeupdater import VolumeUpdater
 from ui.main_window import Ui_MainWindow
-from viewframe import ViewFrame
-from volumeupdater import VolumeUpdater
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +88,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # Current Working Directory to use with file selectors.
-        self.CWD_path: str = "."
+        self.CWD_path: str = ""
 
         # Qt interface setup.
         self.ui = Ui_MainWindow()

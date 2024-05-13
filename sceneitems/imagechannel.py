@@ -48,10 +48,17 @@ from PyQt5.QtWidgets import (
 from vtkmodules.vtkCommonDataModel import vtkPiecewiseFunction
 from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 
-from eventfilter import (
+from main.eventfilter import (
     EditDoneEventFilter,
     MOUSE_WHEEL_EVENT_FILTER,
 )
+from main.validatenumericinput import (
+    nice_exp_format,
+    validate_float,
+)
+from main.viewframe import ViewFrame
+if TYPE_CHECKING:
+    from main.scene import Scene
 from sceneitems.sceneitem import (
     SceneItem,
     load_bool,
@@ -61,16 +68,8 @@ from sceneitems.sceneitem import (
     load_vec,
 )
 from ui.settings_channel import Ui_SettingsChannel
-from validatenumericinput import (
-    nice_exp_format,
-    validate_float,
-)
-from viewframe import ViewFrame
 
 logger = logging.getLogger(__name__)
-
-if TYPE_CHECKING:
-    from scene import Scene
 
 # These are the upper-bound colors used for different channel IDs by default.
 DEFAULT_CHANNEL_COLORS: list[QColor] = [

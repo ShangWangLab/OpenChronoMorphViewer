@@ -1,3 +1,19 @@
+#  Open Chrono-Morph Viewer, a project for visualizing volumetric time-series.
+#  Copyright © 2024 Andre C. Faubert
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import copy
 from typing import Optional
 
@@ -18,7 +34,7 @@ from animation.asceneitems.acamera import (
 )
 from animation.asceneitems.acontrolpoint import cp_origin_to_struct
 from animation.splines import CylinderSpline
-from volumeimage import VolumeImage
+from main.volumeimage import VolumeImage
 
 
 class AFrameSpan:

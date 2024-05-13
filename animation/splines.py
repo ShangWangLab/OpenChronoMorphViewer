@@ -1,3 +1,19 @@
+#  Open Chrono-Morph Viewer, a project for visualizing volumetric time-series.
+#  Copyright © 2024 Andre C. Faubert
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import numpy as np
 from scipy.spatial.distance import cdist
 
@@ -121,5 +137,5 @@ def dif_phi(x: np.array, c: np.array) -> np.array:
     r2 = cdist(x, c, metric="sqeuclidean")
     r2[r2 == 0] = 1  # Avoid ln(0)
     d_phi_d_var0 = (x[:, 0, None] - c[:, 0, None].T) * (np.log(r2) + 1)
-    d_phi_d_var1 = (x[:, 1, None] - c[:, 1, None].T) *(np.log(r2) + 1)
+    d_phi_d_var1 = (x[:, 1, None] - c[:, 1, None].T) * (np.log(r2) + 1)
     return d_phi_d_var0, d_phi_d_var1

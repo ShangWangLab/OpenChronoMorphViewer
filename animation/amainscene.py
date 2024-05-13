@@ -30,7 +30,7 @@ from animation.asceneitems.aimagechannel import AImageChannel
 from animation.asceneitems.aorientationmarker import AOrientationMarker
 from animation.asceneitems.ascalebar import AScaleBar
 from animation.aview import AView
-from scene import (
+from main.scene import (
     MAX_ACTIVE_PLANES,
     MAX_CHANNELS,
 )
@@ -38,8 +38,8 @@ from sceneitems.sceneitem import (
     load_int,
     Vec3,
 )
-from timeline import Timeline
-from volumeimage import (
+from main.timeline import Timeline
+from main.volumeimage import (
     ImageBounds,
     VolumeImage,
 )

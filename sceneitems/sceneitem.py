@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from viewframe import ViewFrame
+from main.viewframe import ViewFrame
 
 logger = logging.getLogger(__name__)
 

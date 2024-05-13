@@ -30,11 +30,11 @@ from typing import (
 import numpy as np
 import numpy.typing as npt
 
-from errorreporter import (
+from main.errorreporter import (
     FileError,
     ErrorReporter,
 )
-from volumeimage import (
+from main.volumeimage import (
     ImageBounds,
     VolumeImage,
 )

@@ -26,8 +26,8 @@ from animation.aframespan import AFrameSpan
 from animation.amainscene import AMainScene
 from animation.aview import AView
 from animation.errorreportlogger import ErrorReportLogger
-from timeline import Timeline
-from volumeimage import VolumeImage
+from main.timeline import Timeline
+from main.volumeimage import VolumeImage
 
 
 class Animator:

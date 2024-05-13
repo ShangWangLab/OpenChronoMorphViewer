@@ -25,16 +25,16 @@ from vtkmodules.vtkCommonDataModel import vtkPlane
 from vtkmodules.vtkInteractionWidgets import vtkImplicitPlaneWidget
 from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
-from eventfilter import EditDoneEventFilter
+from main.eventfilter import EditDoneEventFilter
 from sceneitems.camera import Camera
 from sceneitems.sceneitem import (
     SceneItem,
     Vec3, load_str, load_vec,
 )
 from ui.settings_plane import Ui_SettingsPlane
-from validatenumericinput import validate_float_any
-from viewframe import ViewFrame
-from volumeimage import ImageBounds
+from main.validatenumericinput import validate_float_any
+from main.viewframe import ViewFrame
+from main.volumeimage import ImageBounds
 
 logger = logging.getLogger(__name__)
 

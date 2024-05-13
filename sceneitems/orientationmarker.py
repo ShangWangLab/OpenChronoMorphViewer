@@ -26,14 +26,14 @@ from vtkmodules.vtkInteractionWidgets import vtkOrientationMarkerWidget
 from vtkmodules.vtkRenderingAnnotation import vtkAxesActor
 from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
-from eventfilter import EditDoneEventFilter
+from main.eventfilter import EditDoneEventFilter
+from main.validatenumericinput import validate_float
+from main.viewframe import ViewFrame
 from sceneitems.sceneitem import (
     SceneItem,
     load_vec,
 )
 from ui.settings_orientation_marker import Ui_SettingsOrientationMarker
-from validatenumericinput import validate_float
-from viewframe import ViewFrame
 
 logger = logging.getLogger(__name__)
 

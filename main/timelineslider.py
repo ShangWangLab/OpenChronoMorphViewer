@@ -13,19 +13,45 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
 from typing import Any, Optional
 
-from autoplayer import AutoPlayer
-from eventfilter import EditDoneEventFilter
-from timeline import Timeline
-from ui.main_window import Ui_MainWindow
-from validatenumericinput import (
+from main.autoplayer import AutoPlayer
+from main.eventfilter import EditDoneEventFilter
+from main.timeline import Timeline
+from main.validatenumericinput import (
     validate_float,
     validate_int,
 )
-from volumeupdater import VolumeUpdater
+from main.volumeupdater import VolumeUpdater
+from ui.main_window import Ui_MainWindow
 
 logger = logging.getLogger(__name__)
 

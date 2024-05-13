@@ -24,12 +24,11 @@ from PyQt5.QtCore import Qt
 from vtkmodules.vtkCommonCore import vtkCommand
 from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
+from main.viewframe import ViewFrame
+if TYPE_CHECKING:
+    from main.scene import Scene
 from sceneitems.planecontroller import PlaneController
 from sceneitems.sceneitem import Vec3
-from viewframe import ViewFrame
-
-if TYPE_CHECKING:
-    from scene import Scene
 
 logger = logging.getLogger(__name__)
 

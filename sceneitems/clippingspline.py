@@ -27,27 +27,27 @@ from PyQt5.QtWidgets import (
     QListWidget,
 )
 
-from errorreporter import ErrorReporter
-from eventfilter import EditDoneEventFilter
-from maskupdater import MaskUpdater
+from main.errorreporter import ErrorReporter
+from main.eventfilter import EditDoneEventFilter
+from main.maskupdater import MaskUpdater
+from main.timeline import Timeline
+from main.validatenumericinput import (
+    nice_exp_format,
+    validate_float,
+)
+from main.viewframe import ViewFrame
+from main.volumeimage import (
+    ImageBounds,
+    VolumeImage,
+)
+from main.volumemasktps import VolumeMaskTPS
 from sceneitems.camera import Camera
 from sceneitems.controlpoint import ControlPoint
 from sceneitems.sceneitem import (
     SceneItem,
     Vec3, load_int, load_bool, load_float,
 )
-from timeline import Timeline
 from ui.settings_clipping_spline import Ui_SettingsClippingSpline
-from validatenumericinput import (
-    nice_exp_format,
-    validate_float,
-)
-from viewframe import ViewFrame
-from volumeimage import (
-    ImageBounds,
-    VolumeImage,
-)
-from volumemasktps import VolumeMaskTPS
 
 logger = logging.getLogger(__name__)
 

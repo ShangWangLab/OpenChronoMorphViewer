@@ -28,7 +28,7 @@ from sceneitems.sceneitem import (
     Vec3,
     load_vec,
 )
-from volumeimage import ImageBounds
+from main.volumeimage import ImageBounds
 
 logger = logging.getLogger(__name__)
 

@@ -21,7 +21,7 @@ from animation.amainscene import AMainScene
 from animation.annotation import Annotation
 from animation.ascene import AScene
 from animation.aview import AView
-from volumeimage import VolumeImage
+from main.volumeimage import VolumeImage
 
 
 class AFrame:

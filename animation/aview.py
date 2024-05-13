@@ -29,7 +29,7 @@ from vtkmodules.vtkRenderingCore import (
 )
 from vtkmodules.vtkRenderingVolumeOpenGL2 import vtkOpenGLGPUVolumeRayCastMapper
 
-from volumeimage import VolumeImage
+from main.volumeimage import VolumeImage
 
 logger = logging.getLogger(__name__)
 

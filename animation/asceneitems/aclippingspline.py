@@ -29,12 +29,12 @@ from sceneitems.sceneitem import (
     load_float,
     load_int,
 )
-from timeline import Timeline
-from volumeimage import (
+from main.timeline import Timeline
+from main.volumeimage import (
     ImageBounds,
     VolumeImage,
 )
-from volumemasktps import VolumeMaskTPS
+from main.volumemasktps import VolumeMaskTPS
 
 logger = logging.getLogger(__name__)
 

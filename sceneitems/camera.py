@@ -26,10 +26,13 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget
 from vtkmodules.vtkRenderingCore import vtkCamera
 
-from eventfilter import (
+from main.eventfilter import (
     EditDoneEventFilter,
     MOUSE_WHEEL_EVENT_FILTER,
 )
+from main.timeline import Timeline
+from main.validatenumericinput import validate_float_any
+from main.viewframe import ViewFrame
 from sceneitems.scalebar import ScaleBar
 from sceneitems.sceneitem import (
     SceneItem,
@@ -38,10 +41,7 @@ from sceneitems.sceneitem import (
     load_float,
     load_vec,
 )
-from timeline import Timeline
 from ui.settings_camera import Ui_SettingsCamera
-from validatenumericinput import validate_float_any
-from viewframe import ViewFrame
 
 logger = logging.getLogger(__name__)
 

@@ -13,6 +13,19 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
 import logging
@@ -33,11 +46,17 @@ from vtkmodules.vtkCommonCore import vtkCommand
 from vtkmodules.vtkCommonDataModel import vtkPlaneCollection
 from vtkmodules.vtkRenderingVolume import vtkVolumePicker
 
-from errorreporter import (
+from main.errorreporter import (
     ErrorReporter,
     FileError,
 )
-from eventfilter import ResizeEventFilter
+from main.eventfilter import ResizeEventFilter
+from main.timeline import Timeline
+from main.viewframe import ViewFrame
+from main.volumeimage import (
+    ImageBounds,
+    VolumeImage,
+)
 from sceneitems.camera import Camera
 from sceneitems.clippingplane import ClippingPlane
 from sceneitems.clippingspline import ClippingSpline
@@ -47,13 +66,7 @@ from sceneitems.orientationmarker import OrientationMarker
 from sceneitems.planecontroller import PlaneController
 from sceneitems.scalebar import ScaleBar
 from sceneitems.sceneitem import SceneItem, load_int, Vec3
-from timeline import Timeline
 from ui.main_window import Ui_MainWindow
-from viewframe import ViewFrame
-from volumeimage import (
-    ImageBounds,
-    VolumeImage,
-)
 
 logger = logging.getLogger(__name__)
 

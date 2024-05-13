@@ -32,12 +32,11 @@ from vtkmodules.vtkRenderingCore import (
     vtkPolyDataMapper,
 )
 
+from main.viewframe import ViewFrame
 from sceneitems.planecontroller import PlaneController
 from sceneitems.sceneitem import Vec3
-from viewframe import ViewFrame
-
 if TYPE_CHECKING:
-    from clippingspline import ClippingSpline
+    from sceneitems.clippingspline import ClippingSpline
 
 logger = logging.getLogger(__name__)
 
