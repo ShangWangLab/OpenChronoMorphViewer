@@ -61,5 +61,4 @@ Please reach out to Andre Faubert (<afaubert@stevens.edu>) with any questions or
 
 Funded by the National Institutes of Health (R35GM142953).
 
-A special thanks to our colleagues at [Dr. Shang Wang's Biophotonic's Lab]
-(https://www.shangwanglab.org/team)!
+A special thanks to our colleagues at [Dr. Shang Wang's Biophotonic's Lab](https://www.shangwanglab.org/team)!
