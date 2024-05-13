@@ -1,4 +1,4 @@
-# <img src="ui/graphics/icon_window.ico" width="32" alt="Logo" /> Open Chrono-Morph Viewer (OCMV)
+# <img src="ui/graphics/icon_window.ico" width="48" alt="Logo" /> Open Chrono-Morph Viewer (OCMV)
 
 This project represents a cross-platform visualization package for large
 3D, 4D, and 5D data sets with multiple image channels. There is support
