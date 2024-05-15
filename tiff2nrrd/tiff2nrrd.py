@@ -7,7 +7,7 @@ Usage:
     python3.11 tiff2nrrd.py <directory of image files> <directory of NHDR files>
 
 Formats for file names:
-    Input: name_Ssss_Tttt_Ccc.tif
+    Input: name_Ssss_Zzzz_Tttt_Ccc.tif
     Output: Sssss_Ttttt.nhdr and Sssss_Ttttt.raw
 """
 
