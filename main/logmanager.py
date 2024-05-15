@@ -58,11 +58,12 @@ import faulthandler
 import logging
 import os
 from io import TextIOWrapper
+import tempfile
 from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-LOG_DIR: str = "../logs"
+LOG_DIR: str = os.path.join(tempfile.gettempdir(), "OCMV_logs")
 DATE_FMT: str = "%Y-%m-%d_%H%M"
 
 
@@ -77,7 +78,7 @@ class LogManager:
     def start_logging(self) -> None:
         """Make a log file for the current session and start logging to it."""
 
-        if not os.path.exists("../logs"):
+        if not os.path.exists(LOG_DIR):
             try:
                 os.mkdir(LOG_DIR)
             except OSError:
