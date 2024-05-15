@@ -1,24 +1,12 @@
-# <img src="ui/graphics/icon_window.ico" width="48" alt="Logo" /> Open Chrono-Morph Viewer (OCMV)
+# ![Open Chrono-Morph Viewer](ui/graphics/design/logo_text.png)
 
-This project represents a cross-platform visualization package for large
-3D, 4D, and 5D data sets with multiple image channels. There is support
-for saving keyframes and animating between them with the animation engine
-(requires FFMPEG to convert the animation frames to a video file). The
-viewer also includes a unique, yet intuitive smooth clipping function
-based on thin-plate splines for easily and aesthetically tracking
-morphology as it changes over time.
-
-This project may be a good fit if you need to:
-- Look through thousands of 3D volumes with minimal overhead.
-- Use an inspectable file format that is easy to look at and understand (unlike DICOM).
-- View complex internal anatomy that cannot be exposed with a combination of simple planar cuts.
-- Make attractive visualizations of morphological development.
-- Save money with a free package.
-- Use a low-end computer.
-
-This project may not be a good fit if you need to:
-- View extremely large volumes that do not fit into RAM.
-- Perform real-time data operations while visualizing.
+The OCMV project represents a cross-platform visualization package for
+large volumetric image sets with multiple image channels and one or two
+temporal axes. There is support for saving keyframes and animating
+between them with the animation engine (requiring FFMPEG to convert the 
+animation frames to a video file). The viewer also includes a unique,
+yet intuitive smooth clipping function based on thin-plate splines for 
+easily and aesthetically tracking morphology as it changes over time.
 
 ## Supported Platforms
 
