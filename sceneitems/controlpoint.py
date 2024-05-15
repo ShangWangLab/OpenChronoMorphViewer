@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
+import time
 from typing import (
     Any,
     TYPE_CHECKING,
@@ -41,6 +42,11 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+# How long to ignore events after a "pick" event occurs.
+# The acts similarly to a "debounce" timer to prevent repeated event triggers.
+PICK_DEBOUNCE_TIME: float = 0.1  # sec
+
+
 class ControlPoint(PlaneController):
     """Stores the VTK plane widget and manages its UI data.
 
@@ -56,7 +62,7 @@ class ControlPoint(PlaneController):
                  origin: Vec3,
                  view_frame: ViewFrame,
                  clipping_spline: "ClippingSpline") -> None:
-        self.suppress_next_interaction: bool = False
+        self.last_pick_time: float = 0  # Seconds since the last "pick"
         self.view_frame: ViewFrame = view_frame
         self.clipping_spline: "ClippingSpline" = clipping_spline
         self.sphere_source = vtkSphereSource()
@@ -75,11 +81,11 @@ class ControlPoint(PlaneController):
             Can be used as a VTK event callback. The arguments are ignored.
             """
 
+            self.scene_list.setCurrentItem(self.list_widget)
             # Interactions can be triggered by a "pick" event, even when the
             # plane doesn't change. This would cause needless clipper updates,
             # so we suppress the next interaction event.
-            self.suppress_next_interaction = True
-            self.scene_list.setCurrentItem(self.list_widget)
+            self.last_pick_time = time.time()
             logger.info("Picked.")
 
         self.sphere_actor.AddObserver(
@@ -98,11 +104,12 @@ class ControlPoint(PlaneController):
             """
 
             # Interactions can be triggered by a "pick" event, even when the
-            # plane doesn't change. This would cause needless clipper updates,
-            # so we suppress the next interaction event.
-            if self.suppress_next_interaction:
-                self.suppress_next_interaction = False
+            # plane doesn't change. This can cause needless clipper updates,
+            # so we suppress these for a brief period after a pick.
+            if time.time() - self.last_pick_time < PICK_DEBOUNCE_TIME:
+                logger.debug("Interaction event suppressed by pick debouncer.")
                 return
+            logger.debug("Control point interaction.")
             self.update_view()
             self.sphere_source.SetCenter(self.get_origin())
             self.clipping_spline.mask.update_cp(self)
