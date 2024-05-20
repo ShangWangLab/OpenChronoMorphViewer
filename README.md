@@ -8,6 +8,10 @@ animation frames to a video file). The viewer also includes a unique,
 yet intuitive smooth clipping function based on thin-plate splines for 
 easily and aesthetically tracking morphology as it changes over time.
 
+Detailed installation instructions, demonstration videos, and
+instructions for use will be available in the manuscript, which will be
+linked here once published.
+
 ## Supported Platforms
 
 - Windows 10/11
@@ -49,4 +53,5 @@ Please reach out to Andre Faubert (<afaubert@stevens.edu>) with any questions or
 
 Funded by the National Institutes of Health (R35GM142953).
 
-A special thanks to our colleagues at [Dr. Shang Wang's Biophotonic's Lab](https://www.shangwanglab.org/team)!
+A special thanks to our colleagues at
+[Dr. Shang Wang's Biophotonic's Lab](https://www.shangwanglab.org/team)!
