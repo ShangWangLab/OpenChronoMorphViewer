@@ -122,11 +122,13 @@ class SceneItem:
         if self.INITIAL_CHECK_STATE is None:
             logger.debug(f"This type of item can't be checked.")
             return
-        self.checked = checked
         if self.list_widget is None:
             logger.debug(f"There is no item to check.")
             return
         self.list_widget.setCheckState(Qt.Checked if checked else Qt.Unchecked)  # type: ignore
+        # Must be set after updating the list widget so the "item changed" event
+        # can be handled properly.
+        self.checked = checked
 
     def update_view(self, *_: Any) -> None:
         """Fill out visible information in the UI and VTK view port.

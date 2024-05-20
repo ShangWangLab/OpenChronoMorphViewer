@@ -183,9 +183,14 @@ class Scene:
         def on_toggle_item(_: bool = False) -> None:
             item: Optional[QListWidgetItem] = self.ui.scene_list.currentItem()
             if item is None:
+                logger.debug("No scene item selected to toggle.")
+                return
+            if not (item.flags() & Qt.ItemIsUserCheckable):
+                logger.debug("Scene item cannot be toggled.")
                 return
             scene_item: SceneItem = item.scene_item
             scene_item.set_checked(not scene_item.checked)
+            logger.debug("Scene item toggled.")
 
         self.ui.action_toggle_item.triggered.connect(on_toggle_item)
         self.ui.action_toggle_item.setShortcut("Ctrl+H")
@@ -278,9 +283,10 @@ class Scene:
                 logger.debug("_on_item_changed:VTK_render()")
                 self.view_frame.vtk_render()
         else:
-            # "item" isn't a clipping plane, so no further treatment is necessary.
+            # `item` isn't a clipping plane, so no further treatment is necessary.
             return
 
+        # `item` is a clipping plane.
         plane = list_item.scene_item
         now_checked = plane.list_widget.checkState() == Qt.Checked  # type: ignore
         if plane.checked == now_checked:
