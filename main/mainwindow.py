@@ -55,17 +55,20 @@
 
 import logging
 import os
+from typing import Optional
+import webbrowser
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
     QMainWindow,
+    QMessageBox,
     QProgressDialog,
-    QShortcut,
 )
 
 from main.cachelimiter import CacheLimiter
+from main.dialogrendersettings import DialogRenderSettings
 from main.errorreporter import ErrorReporter
 from main.scene import Scene
 from main.timeline import Timeline
@@ -75,6 +78,21 @@ from main.volumeupdater import VolumeUpdater
 from ui.main_window import Ui_MainWindow
 
 logger = logging.getLogger(__name__)
+
+
+OCMV_VERSION: str = "0.9"
+PROJECT_URL: str = "https://github.com/ShangWangLab/OpenChronoMorphViewer"
+ACKNOWLEDGEMENTS: str = """\
+Funded by the National Institutes of Health (R35GM142953).
+
+A special thanks to our colleagues at Dr. Shang Wang's Biophotonics Lab! \
+https://www.shangwanglab.org/team"""
+
+
+def on_go_to_project_page(_: bool = False) -> None:
+    """Respond to the action to navigate a web browser to the project page."""
+
+    webbrowser.open(PROJECT_URL)
 
 
 class MainWindow(QMainWindow):
@@ -87,6 +105,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
+        self.dialog_render_settings: Optional[DialogRenderSettings] = None
         # Current Working Directory to use with file selectors.
         self.CWD_path: str = ""
 
@@ -149,30 +168,21 @@ class MainWindow(QMainWindow):
 
         self.ui.action_screenshot.triggered.connect(self.on_screenshot)
         self.ui.action_screenshot.setShortcut("Ctrl+R")
+        self.ui.action_render_settings.triggered.connect(self.on_show_render_settings)
 
-        # TODO: Implement
-        # self.ui.action_increase_phase.triggered.connect(self.)
-        self.ui.action_increase_phase.setShortcut("Ctrl+Up")
-        # self.ui.action_decrease_phase.triggered.connect(self.)
-        self.ui.action_decrease_phase.setShortcut("Ctrl+Down")
+        self.ui.action_acknowledgements.triggered.connect(self.on_show_acknowledgements)
+        self.ui.action_project.triggered.connect(on_go_to_project_page)
+        self.ui.action_version.triggered.connect(self.on_show_version)
 
-        # This is an example of how to add a keybinding to the main window,
-        # but I generally prefer to bind these to actions in the menu bar as a
-        # form of functionality documentation.
-        # self.shortcut_file_open = QShortcut("Ctrl+O", self)
-        # self.shortcut_file_open.activated.connect(self.on_file_open)
-
-        # TODO: delete this shortcut
-        self.shortcut_debug = QShortcut("t", self)
-        # noinspection PyUnresolvedReferences
-        self.shortcut_debug.activated.connect(self.debug)
+        # This is an example of how to add a keybinding to the main window.
+        # However, I prefer to bind these to actions in the menu bar as a
+        # form of documentation for the function:
+        # self.shortcut_xxx = QShortcut("Ctrl+x", self)
+        # self.shortcut_xxx.activated.connect(self.on_xxx)
 
         self.cache_limiter.bind_event_listeners()
         self.timeline_slider.bind_event_listeners()
         self.scene.bind_event_listeners()
-
-    def debug(self, _: bool = False) -> None:
-        """TODO: remove this debugging code."""
 
     def on_file_open(self, _: bool = False) -> None:
         """Respond to the "File->Open Volumes..." action.
@@ -298,6 +308,23 @@ class MainWindow(QMainWindow):
         else:
             logger.warning("Unrecognized file filter. Defaulting to PNG.")
             self.view_frame.save_png(file_path)
+
+    def on_show_render_settings(self, _: bool = False) -> None:
+        """Respond to the action to show the render settings dialog."""
+
+        self.dialog_render_settings = DialogRenderSettings(self, self.view_frame)
+        self.dialog_render_settings.open()
+
+    def on_show_acknowledgements(self, _: bool = False) -> None:
+        """Respond to the action to show the acknowledgements."""
+
+        QMessageBox.information(self, 'Acknowledgements', ACKNOWLEDGEMENTS)
+
+    def on_show_version(self, _: bool = False) -> None:
+        """Respond to the action to display the current version number."""
+
+        QMessageBox.information(
+            self, 'Version', f'OCMV version {OCMV_VERSION}')
 
     def start(self) -> None:
         """Pass the 'start' signal to objects that need it."""

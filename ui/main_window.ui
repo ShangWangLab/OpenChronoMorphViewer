@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>950</width>
-    <height>646</height>
+    <width>954</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -82,7 +82,7 @@
            <x>0</x>
            <y>0</y>
            <width>254</width>
-           <height>320</height>
+           <height>329</height>
           </rect>
          </property>
         </widget>
@@ -572,7 +572,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>950</width>
+     <width>954</width>
      <height>26</height>
     </rect>
    </property>
@@ -589,9 +589,6 @@
     <addaction name="action_save_scene_as"/>
     <addaction name="action_save_keyframe"/>
     <addaction name="action_load_scene"/>
-    <addaction name="separator"/>
-    <addaction name="action_increase_phase"/>
-    <addaction name="action_decrease_phase"/>
    </widget>
    <widget class="QMenu" name="menu_render">
     <property name="title">
@@ -625,7 +622,7 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
-    <addaction name="action_manual"/>
+    <addaction name="action_project"/>
     <addaction name="action_acknowledgements"/>
     <addaction name="action_version"/>
    </widget>
@@ -662,7 +659,7 @@
     <string>Save Scene...</string>
    </property>
    <property name="toolTip">
-    <string>Write all settings and visual elements to a file</string>
+    <string>Write all settings and visual elements to the save file</string>
    </property>
   </action>
   <action name="action_load_scene">
@@ -677,13 +674,16 @@
    <property name="text">
     <string>To Image...</string>
    </property>
+   <property name="toolTip">
+    <string>Save the current view as an image</string>
+   </property>
   </action>
   <action name="action_render_settings">
    <property name="text">
     <string>Settings...</string>
    </property>
-   <property name="iconText">
-    <string>Not implemented</string>
+   <property name="toolTip">
+    <string>Edit settings related to the render frame</string>
    </property>
   </action>
   <action name="action_print_item">
@@ -779,19 +779,28 @@
     <string>Jump to the previous sequence</string>
    </property>
   </action>
-  <action name="action_manual">
+  <action name="action_project">
    <property name="text">
-    <string>Manual...</string>
+    <string>Project...</string>
+   </property>
+   <property name="toolTip">
+    <string>Go to the project page on GitHub</string>
    </property>
   </action>
   <action name="action_acknowledgements">
    <property name="text">
     <string>Acknowledgements...</string>
    </property>
+   <property name="toolTip">
+    <string>Display the acknowledgements</string>
+   </property>
   </action>
   <action name="action_version">
    <property name="text">
     <string>Version...</string>
+   </property>
+   <property name="toolTip">
+    <string>The current version number</string>
    </property>
   </action>
   <action name="action_deselect_item">
@@ -805,6 +814,9 @@
   <action name="action_save_scene_as">
    <property name="text">
     <string>Save Scene As...</string>
+   </property>
+   <property name="toolTip">
+    <string>Write all settings and visual elements to a file</string>
    </property>
   </action>
   <action name="action_start_of_sequence">
@@ -828,6 +840,9 @@
   <action name="action_delete_item">
    <property name="text">
     <string>Delete Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the active item</string>
    </property>
   </action>
  </widget>

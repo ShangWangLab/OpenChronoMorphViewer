@@ -62,6 +62,7 @@ def compile_ui() -> None:
         "settings_orientation_marker",
         "settings_plane",
         "settings_scale_bar",
+        "dialog_render_settings",
     ]
 
     for name in packages:

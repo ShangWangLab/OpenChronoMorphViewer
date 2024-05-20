@@ -17,16 +17,23 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import math
+from typing import Optional
 
 
-def validate_int(value: str, min_: int, max_: int) -> int:
+def validate_int(value: str, min_: int, max_: Optional[int] = None,
+                 default: Optional[int] = None) -> int:
     """Force value to be an int within min_ and max_."""
 
     try:
         ret = int(value)
     except ValueError:
-        ret = min_
-    ret = max(min_, min(max_, ret))
+        if default is None:
+            ret = min_
+        else:
+            ret = default
+    ret = max(min_, ret)
+    if max_ is not None:
+        ret = min(max_, ret)
     return ret
 
 
