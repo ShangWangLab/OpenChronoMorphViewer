@@ -150,6 +150,9 @@ class VolumeImage:
                 directions = directions[1:, :]
             elif directions.shape != (3, 3):
                 return FileError("The space directions are malformed", self.path)
+            if np.any(np.isinf(directions)):
+                return FileError("The space directions contain +/- infinity", self.path)
+            np.nan_to_num(directions, copy=False, nan=0)
             # We do not attempt to interpret skew or rotation of the "space directions" matrix.
             self.scale = np.linalg.norm(directions, axis=1)
             if np.any(self.scale <= 0):
@@ -157,6 +160,12 @@ class VolumeImage:
             # XYZ center offset in pixels.
             if "space origin" in header:
                 self.origin = header["space origin"]
+                if np.any(np.isinf(self.origin)):
+                    return FileError("The origin contains +/- infinity", self.path)
+                np.nan_to_num(self.origin, copy=False, nan=0)
+            else:
+                # Center the volume.
+                self.origin = -(self.scale * self.dims[1:])/2
 
             # Custom fields. 5D datasets have a slow and a fast time-axis. The
             # slow axis is the time between acquisition sessions, while the fast
