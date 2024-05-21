@@ -178,7 +178,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Back one sequence (Page Up)</string>
+         <string>Back one group (Page Up)</string>
         </property>
         <property name="text">
          <string/>
@@ -210,7 +210,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Forward one sequence (Page Down)</string>
+         <string>Forward one group (Page Down)</string>
         </property>
         <property name="text">
          <string/>
@@ -253,6 +253,9 @@
          </property>
          <item>
           <widget class="QLabel" name="label_n_cycles">
+           <property name="toolTip">
+            <string>How many times to repeat a group before advancing (0 = repeat forever)</string>
+           </property>
            <property name="text">
             <string>Cycles</string>
            </property>
@@ -271,6 +274,9 @@
              <width>20</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>How many times to repeat a group before advancing (0 = repeat forever)</string>
            </property>
            <property name="text">
             <string>1</string>
@@ -349,17 +355,8 @@
            <property name="maxLength">
             <number>5</number>
            </property>
-           <property name="frame">
-            <bool>true</bool>
-           </property>
-           <property name="cursorPosition">
-            <number>0</number>
-           </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -429,14 +426,8 @@
            <property name="toolTip">
             <string>This is the index to jump to when &quot;go to&quot; is pressed</string>
            </property>
-           <property name="inputMask">
-            <string/>
-           </property>
            <property name="text">
             <string>1</string>
-           </property>
-           <property name="maxLength">
-            <number>32767</number>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -472,6 +463,9 @@
          </property>
          <item>
           <widget class="QLabel" name="label_cache">
+           <property name="toolTip">
+            <string>Volumes in the timeline are preloaded until the cache is full</string>
+           </property>
            <property name="text">
             <string>Cache</string>
            </property>
@@ -490,6 +484,9 @@
              <width>30</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>How many GB to limit the volume cache to</string>
            </property>
            <property name="text">
             <string>0.0</string>
@@ -600,7 +597,7 @@
     <addaction name="action_screenshot"/>
     <addaction name="action_render_settings"/>
    </widget>
-   <widget class="QMenu" name="menu_viewer">
+   <widget class="QMenu" name="menu_timeline">
     <property name="title">
      <string>Timeline</string>
     </property>
@@ -610,10 +607,10 @@
     <addaction name="action_play_pause"/>
     <addaction name="action_next_volume"/>
     <addaction name="action_prev_volume"/>
-    <addaction name="action_next_sequence"/>
-    <addaction name="action_prev_sequence"/>
-    <addaction name="action_start_of_sequence"/>
-    <addaction name="action_end_of_sequence"/>
+    <addaction name="action_next_group"/>
+    <addaction name="action_prev_group"/>
+    <addaction name="action_start_of_group"/>
+    <addaction name="action_end_of_group"/>
    </widget>
    <widget class="QMenu" name="menu_about">
     <property name="title">
@@ -630,6 +627,9 @@
     <property name="title">
      <string>Scene</string>
     </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
     <addaction name="action_delete_item"/>
     <addaction name="action_deselect_item"/>
     <addaction name="action_toggle_item"/>
@@ -640,7 +640,7 @@
     <addaction name="action_place_control_point"/>
    </widget>
    <addaction name="menu_file"/>
-   <addaction name="menu_viewer"/>
+   <addaction name="menu_timeline"/>
    <addaction name="menu_scene"/>
    <addaction name="menu_render"/>
    <addaction name="menu_about"/>
@@ -720,7 +720,7 @@
     <string>Play/Pause</string>
    </property>
    <property name="toolTip">
-    <string>Autoplay volumes</string>
+    <string>Autoplay or stop autoplaying volumes</string>
    </property>
   </action>
   <action name="action_next_volume">
@@ -763,20 +763,20 @@
     <string>Like &quot;Save Scene&quot;, but automatically names the file</string>
    </property>
   </action>
-  <action name="action_next_sequence">
+  <action name="action_next_group">
    <property name="text">
-    <string>Next Sequence</string>
+    <string>Next Group</string>
    </property>
    <property name="toolTip">
-    <string>Jump to the next sequence</string>
+    <string>Jump to the next volume group</string>
    </property>
   </action>
-  <action name="action_prev_sequence">
+  <action name="action_prev_group">
    <property name="text">
-    <string>Prev. Sequence</string>
+    <string>Prev. Group</string>
    </property>
    <property name="toolTip">
-    <string>Jump to the previous sequence</string>
+    <string>Jump to the previous volume group</string>
    </property>
   </action>
   <action name="action_project">
@@ -819,14 +819,20 @@
     <string>Write all settings and visual elements to a file</string>
    </property>
   </action>
-  <action name="action_start_of_sequence">
+  <action name="action_start_of_group">
    <property name="text">
-    <string>Start of Sequence</string>
+    <string>Start of Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the first volume of the current group</string>
    </property>
   </action>
-  <action name="action_end_of_sequence">
+  <action name="action_end_of_group">
    <property name="text">
-    <string>End of Sequence</string>
+    <string>End of Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the last volume of the current group</string>
    </property>
   </action>
   <action name="action_place_control_point">

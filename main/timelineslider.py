@@ -196,15 +196,15 @@ class TimelineSlider:
         self.ui.action_next_volume.setShortcut("right")
         self.ui.action_prev_volume.triggered.connect(lambda _: self.add(-1))
         self.ui.action_prev_volume.setShortcut("left")
-        self.ui.action_next_sequence.triggered.connect(self._on_next_group)
-        self.ui.action_next_sequence.setShortcut("page down")
-        self.ui.action_prev_sequence.triggered.connect(self._on_prev_group)
-        self.ui.action_prev_sequence.setShortcut("page up")
+        self.ui.action_next_group.triggered.connect(self._on_next_group)
+        self.ui.action_next_group.setShortcut("page down")
+        self.ui.action_prev_group.triggered.connect(self._on_prev_group)
+        self.ui.action_prev_group.setShortcut("page up")
 
-        self.ui.action_start_of_sequence.triggered.connect(self._goto_group_start)
-        self.ui.action_start_of_sequence.setShortcut(",")
-        self.ui.action_end_of_sequence.triggered.connect(self._goto_group_end)
-        self.ui.action_end_of_sequence.setShortcut(".")
+        self.ui.action_start_of_group.triggered.connect(self._goto_group_start)
+        self.ui.action_start_of_group.setShortcut(",")
+        self.ui.action_end_of_group.triggered.connect(self._goto_group_end)
+        self.ui.action_end_of_group.setShortcut(".")
 
     def set_index(self, index: int) -> None:
         """Update the slider position (0-based indexing).
