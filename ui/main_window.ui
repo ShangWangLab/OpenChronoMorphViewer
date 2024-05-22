@@ -761,7 +761,7 @@
     <string>Save Keyframe</string>
    </property>
    <property name="toolTip">
-    <string>Like &quot;Save Scene&quot;, but automatically names the file</string>
+    <string>Save the selected subset of the visual elements in the scene to a keyframe</string>
    </property>
   </action>
   <action name="action_next_group">
@@ -801,7 +801,7 @@
     <string>Version...</string>
    </property>
    <property name="toolTip">
-    <string>The current version number</string>
+    <string>Display the current version number</string>
    </property>
   </action>
   <action name="action_deselect_item">
