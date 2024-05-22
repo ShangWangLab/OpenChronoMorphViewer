@@ -98,7 +98,7 @@ class AView:
         self.last_volume = volume
 
         self.v_mapper.SetInputConnection(
-            volume.get_vtk_image().GetOutputPort()
+            volume.vtk_image().GetOutputPort()
         )
         logger.debug("Added volume data to mapper.")
 

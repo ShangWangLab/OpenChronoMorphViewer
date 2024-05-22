@@ -77,7 +77,7 @@ class AMainScene:
         """Called whenever the active volume is replaced."""
 
         self.last_volume = volume
-        self.bounds = volume.get_bounds()
+        self.bounds = volume.bounds()
         scalar_range = volume.get_scalar_range()
         logger.debug(f"Volume, bound={self.bounds}, range={scalar_range}")
         for chan in self.image_channels:

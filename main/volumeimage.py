@@ -68,7 +68,7 @@ class VolumeImage:
 
         # The raw image data.
         self.image: Optional[npt.NDArray] = None
-        self.vtk_image: Optional[vtkImageImport] = None
+        self._vtk_image: Optional[vtkImageImport] = None
 
         # This lock prevents the data from being partially unloaded while it
         # is loading, or vice versa.
@@ -255,7 +255,7 @@ class VolumeImage:
             return -32768., 32767.
         raise RuntimeError(f"Unsupported data type: {self.dtype}.")
 
-    def get_n_channels(self) -> int:
+    def n_channels(self) -> int:
         """The number of independent color channels this volume contains."""
 
         assert self.header is not None, "You need to call 'read_header' first."
@@ -328,32 +328,32 @@ class VolumeImage:
     def _make_vtk_image(self) -> None:
         """Create the VTK image data object for viewing."""
 
-        self.vtk_image = vtkImageImport()
-        self.vtk_image.SetImportVoidPointer(self.image.ravel())
+        self._vtk_image = vtkImageImport()
+        self._vtk_image.SetImportVoidPointer(self.image.ravel())
         if self.dtype == np.uint8:
-            self.vtk_image.SetDataScalarTypeToUnsignedChar()
+            self._vtk_image.SetDataScalarTypeToUnsignedChar()
         elif self.dtype == np.uint16:
-            self.vtk_image.SetDataScalarTypeToUnsignedShort()
+            self._vtk_image.SetDataScalarTypeToUnsignedShort()
         elif self.dtype == np.int16:
-            self.vtk_image.SetDataScalarTypeToShort()
+            self._vtk_image.SetDataScalarTypeToShort()
         else:
             raise RuntimeError("It is supposed to be impossible to set the wrong data type.")
-        self.vtk_image.SetNumberOfScalarComponents(self.dims[0])
-        self.vtk_image.SetDataExtent(
+        self._vtk_image.SetNumberOfScalarComponents(self.dims[0])
+        self._vtk_image.SetDataExtent(
             0, self.dims[1] - 1,
             0, self.dims[2] - 1,
             0, self.dims[3] - 1
         )
-        self.vtk_image.SetWholeExtent(
+        self._vtk_image.SetWholeExtent(
             0, self.dims[1] - 1,
             0, self.dims[2] - 1,
             0, self.dims[3] - 1
         )
-        self.vtk_image.SetDataSpacing(self.scale)
-        self.vtk_image.SetDataOrigin(self.origin)
+        self._vtk_image.SetDataSpacing(self.scale)
+        self._vtk_image.SetDataOrigin(self.origin)
         # By keeping a handle to the underlying array data, we can avoid
         # VTK access violations related to premature garbage collection.
-        self.vtk_image._array_data = self.image
+        self._vtk_image._array_data = self.image
 
     def unload(self) -> None:
         """Frees the memory containing the image data.
@@ -364,15 +364,15 @@ class VolumeImage:
 
         with self.load_lock:
             self.image = None
-            self.vtk_image = None
+            self._vtk_image = None
 
     def is_loaded(self) -> bool:
         """Determines if the data in this volume has been loaded from disk."""
 
         return self.image is not None
 
-    def get_phase(self) -> float:
-        """Calculate the fraction of the cycle this timepoint represents."""
+    def phase(self) -> float:
+        """Calculate the fraction of the cycle this time point represents."""
 
         return self.time_index / self.n_times
 
@@ -389,20 +389,20 @@ class VolumeImage:
             timestamp += " (" + self.timestamp + ")"
 
         self.label = (
-            f"φ = {self.get_phase():.1%}, "
+            f"φ = {self.phase():.1%}, "
             f"t1 = {self.time_index}/{self.n_times} ({time_sum:0.3f} {self.period_unit}), "
             f"t2 = {timestamp}, "
             f"i = {index + 1}/{n_volumes}"
         )
 
-    def get_vtk_image(self) -> vtkImageImport:
+    def vtk_image(self) -> vtkImageImport:
         """Returns a handle to the VTK image."""
 
         self.access_time = time.time()
         self.load()
-        return self.vtk_image
+        return self._vtk_image
 
-    def get_bounds(self) -> ImageBounds:
+    def bounds(self) -> ImageBounds:
         """The min and max extents of the image in VTK world coordinates."""
 
         assert self.header is not None, "You need to call 'read_header' first."
@@ -415,11 +415,32 @@ class VolumeImage:
             lower[2], upper[2]
         )
 
-    def get_view_scale(self) -> float:
-        """Determines the window scale that will fit this volume.
+    def view_scale(self) -> float:
+        """Determine the window scale that will fit this volume.
 
         The number returned will become half the viewport height in microns.
         """
 
         assert self.header is not None, "You need to call 'read_header' first."
         return 1.5 * np.max(self.scale * self.dims[1:]) / 2
+
+    def histogram(self, i_chan: int) -> npt.NDArray[np.int64]:
+        """Compute the histogram for a certain channel.
+
+        :param i_chan: The index of the channel for which to compute the histogram.
+        :return: Histogram counts for each possible value in the volume for the
+        channel in question.
+        """
+
+        assert self.image is not None, \
+            "The histogram can only be calculated for a loaded volume."
+        assert 0 <= i_chan < self.dims[0], \
+            f"Channel index {i_chan} is out of range."
+        low, high = self.get_scalar_range()
+        bins = np.arange(int(low), int(high) + 2)
+        # Alternatively, we could limit the number of bins and extend this to
+        # floating-point-valued images with a range specification:
+        #   return np.histogram(self.image[:, :, :, i_chan],
+        #                       bins=min(100000, int(high - low + 1)),
+        #                       range=(low, high))[0]
+        return np.histogram(self.image[:, :, :, i_chan], bins=bins)[0]

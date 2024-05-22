@@ -283,14 +283,14 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
 
         i = self.index
         group_index = self.volumes[i].group_index
-        phase = self.volumes[i].get_phase()
+        phase = self.volumes[i].phase()
         while i > 0 and group_index == self.volumes[i].group_index:
             i -= 1
         group_index = self.volumes[i].group_index
         smallest_diff: float = 1.
         i_best: int = i
         while i >= 0 and group_index == self.volumes[i].group_index:
-            diff: float = abs(phase - self.volumes[i].get_phase())
+            diff: float = abs(phase - self.volumes[i].phase())
             if diff > 0.5:
                 diff = 1 - diff
             if diff <= smallest_diff:
@@ -298,7 +298,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 i_best = i
             i -= 1
         logger.debug(f"Prev. to group index {group_index} from i = {self.index} to {i_best} and phase = "
-                     f"{phase} to best match of {self.volumes[i_best].get_phase()}")
+                     f"{phase} to best match of {self.volumes[i_best].phase()}")
         return i_best
 
     def get_next_group_index(self) -> int:
@@ -317,7 +317,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
 
         i = self.index
         group_index = self.volumes[i].group_index
-        phase = self.volumes[i].get_phase()
+        phase = self.volumes[i].phase()
         i_max = len(self.volumes) - 1
         while i < i_max and group_index == self.volumes[i].group_index:
             i += 1
@@ -325,7 +325,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
         smallest_diff: float = 1.
         i_best: int = i
         while i <= i_max and group_index == self.volumes[i].group_index:
-            diff: float = abs(phase - self.volumes[i].get_phase())
+            diff: float = abs(phase - self.volumes[i].phase())
             if diff > 0.5:
                 diff = 1 - diff
             if diff <= smallest_diff:
@@ -333,7 +333,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 i_best = i
             i += 1
         logger.debug(f"Next to group index {group_index} from i = {self.index} to {i_best} and phase = "
-                     f"{phase} to best match of {self.volumes[i_best].get_phase()}")
+                     f"{phase} to best match of {self.volumes[i_best].phase()}")
         return i_best
 
     def get_first_group_index(self) -> int:
@@ -511,7 +511,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
 
         with self.load_lock:
             # Rearrange bounds.
-            bounds = list(zip(*(v.get_bounds() for v in self.volumes)))
+            bounds = list(zip(*(v.bounds() for v in self.volumes)))
             return ImageBounds(
                 min(bounds[0]), max(bounds[1]),
                 min(bounds[2]), max(bounds[3]),
@@ -544,7 +544,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
         """
 
         assert self, "You need to call set_file_paths first."
-        return self.volumes[self.index].get_view_scale()
+        return self.volumes[self.index].view_scale()
 
     def get_group_lengths(self) -> list[int]:
         """Count the number of volumes for each group in the timeline.

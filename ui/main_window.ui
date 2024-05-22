@@ -637,6 +637,7 @@
     <addaction name="action_look_at_plane"/>
     <addaction name="action_plane_to_view"/>
     <addaction name="separator"/>
+    <addaction name="action_adjust_channels"/>
     <addaction name="action_place_control_point"/>
    </widget>
    <addaction name="menu_file"/>
@@ -849,6 +850,14 @@
    </property>
    <property name="toolTip">
     <string>Delete the active item</string>
+   </property>
+  </action>
+  <action name="action_adjust_channels">
+   <property name="text">
+    <string>Adjust Channels</string>
+   </property>
+   <property name="toolTip">
+    <string>Set the channel ranges using the histogram from the current volume</string>
    </property>
   </action>
  </widget>

@@ -24,6 +24,8 @@ from typing import (
     TYPE_CHECKING,
 )
 
+import numpy as np
+import numpy.typing as npt
 from PyQt5.QtCore import (
     Qt,
     QPoint,
@@ -52,13 +54,13 @@ from main.eventfilter import (
     EditDoneEventFilter,
     MOUSE_WHEEL_EVENT_FILTER,
 )
+if TYPE_CHECKING:
+    from main.scene import Scene
 from main.validatenumericinput import (
     nice_exp_format,
     validate_float,
 )
 from main.viewframe import ViewFrame
-if TYPE_CHECKING:
-    from main.scene import Scene
 from sceneitems.sceneitem import (
     SceneItem,
     load_bool,
@@ -72,16 +74,36 @@ from ui.settings_channel import Ui_SettingsChannel
 logger = logging.getLogger(__name__)
 
 # These are the upper-bound colors used for different channel IDs by default.
-DEFAULT_CHANNEL_COLORS: list[QColor] = [
+DEFAULT_LINEAR_CHANNEL_COLORS: list[QColor] = [
     QColor(0xffffff),  # 0: White (default)
-    QColor(0xff7f00),  # 1: Orange (triangular)
-    QColor(0xff0000),  # 2: Red
-    QColor(0x00ff00),  # 3: Green
-    QColor(0xff00ff),  # 4: Purple
+    QColor(0xff0000),  # 1: Red
+    QColor(0x00ff00),  # 2: Green
+    QColor(0x0000ff),  # 3: Blue
+    QColor(0xff00ff),  # 4: Magenta
     QColor(0xffff00),  # 5: Yellow
     QColor(0x00ffff),  # 6: Cyan
-    # ... All subsequent colors are color 0.
+    # ... All subsequent colors rotate through the cycle.
 ]
+
+DEFAULT_TRIANGULAR_CHANNEL_COLORS: list[tuple[QColor, QColor]] = [
+    (QColor(0x00ffff), QColor(0xff00ff)),  # 0: Cyan -> Magenta
+    (QColor(0x0000ff), QColor(0xff7f00)),  # 1: Blue -> Orange
+    (QColor(0x00ff00), QColor(0xffff00)),  # 2: Green -> Yellow
+    (QColor(0x007fff), QColor(0xff0000)),  # 3: Marine -> Red
+    # ... All subsequent colors rotate through the cycle.
+]
+
+# Constant used to distinguish between the histogram of an ordinary linear
+# channel and that of a triangular channel. This is an experimental value.
+# Typical values for a triangular channel seem to cluster around -0.98, while
+# linear tends to range more broadly from 0.15 to 0.99.
+LINEAR_SPREAD_ESTIMATE_THRESHOLD: float = -0.5
+# These represent thresholds which work well enough for computing the dynamic
+# range cutoffs. They essentially represent the fraction of pixels to saturate
+# at the lower and upper ends of the range, respectively. The lower bound is
+# much larger so that a nice transparency effect can be achieved.
+LOW_HISTOGRAM_THRESHOLD: float = 0.3
+HIGH_HISTOGRAM_THRESHOLD: float = 1e-4
 
 
 class TransferFuncPoint(NamedTuple):
@@ -159,23 +181,19 @@ class ImageChannel(SceneItem):
         self.triangular: bool = channel_id == 1
         self.opacity0: float = 0.
         self.opacity1: float = 0.25
+        # The center is always black by default.
+        self.color1: QColor = QColor(0x000000)
         if self.triangular:
             self.range0: float = 0.01
             self.range1: float = 0.45
+            self.color0, self.color2 = DEFAULT_TRIANGULAR_CHANNEL_COLORS[
+                channel_id % len(DEFAULT_TRIANGULAR_CHANNEL_COLORS)]
         else:
             self.range0 = round(40 / 255, 3)
             self.range1 = round(130 / 255, 3)
-
-        # Lower range defaults to blue for triangular, black for linear.
-        self.color0: QColor = QColor(0, 0, 255 * int(self.triangular))
-        # The center is always black by default.
-        self.color1: QColor = QColor(0x000000)
-        # We choose the
-        if channel_id < len(DEFAULT_CHANNEL_COLORS):
-            i_default_color = channel_id
-        else:
-            i_default_color = 0
-        self.color2: QColor = DEFAULT_CHANNEL_COLORS[i_default_color]
+            self.color0: QColor = QColor(0x000000)
+            self.color2: QColor = DEFAULT_LINEAR_CHANNEL_COLORS[
+                channel_id % len(DEFAULT_LINEAR_CHANNEL_COLORS)]
 
         self.transfer_func_item: PolylineItem = PolylineItem()
         self.graphics_scene: QGraphicsScene = QGraphicsScene()
@@ -420,6 +438,102 @@ class ImageChannel(SceneItem):
             # Full transparency.
             otf.AddPoint(0, 0)
         v_prop.SetScalarOpacity(self.channel_id, otf)
+
+    def from_histogram(self, histogram: npt.NDArray[np.int64]) -> None:
+        """Use the histogram from a channel of the volume image to distinguish
+        linear vs. triangular, compute the dynamic range, and update the colors.
+
+        Linear vs. triangular is determined by measuring the spread from the
+        center of the histogram.
+        """
+
+        x = abs(np.linspace(-2, 2, histogram.size)) - 1
+        spread_estimate = (x * histogram).sum() / histogram.sum()
+        logger.debug(f"The histogram spread estimate for channel \
+{self.channel_id} was {spread_estimate}")
+        if spread_estimate > LINEAR_SPREAD_ESTIMATE_THRESHOLD:
+            self._from_histogram_linear(histogram)
+        else:
+            self._from_histogram_triangular(histogram)
+        if self.range0 >= self.range1:
+            logger.info("Dynamic range analysis failed; defaulting to [0-1]")
+            self.range0 = 0.0
+            self.range1 = 1.0
+        self.update_view()
+
+    def _from_histogram_linear(self, histogram: npt.NDArray[np.int64]) -> None:
+        """Compute the dynamic range for a linear histogram.
+
+        The dynamic range is chosen to have a predefined fraction of saturated
+        pixels on the upper and lower ends, assuming low values are transparent.
+        Colors are updated if this channel used to be triangular.
+        """
+
+        s: int = histogram.size
+        # Skip the first bin since histograms often contain many zeros
+        # which shouldn't be counted as part of the valid image.
+        n: int = histogram[1:].sum()
+        i: int = 0
+        sum_low: int = 0
+        for i in range(1, s):
+            sum_low += histogram[i]
+            if sum_low > n*LOW_HISTOGRAM_THRESHOLD:
+                break
+        self.range0 = round(i / (s - 1), 6)
+
+        sum_high: int = 0
+        for i in reversed(range(s)):
+            sum_high += histogram[i]
+            if sum_high > n*HIGH_HISTOGRAM_THRESHOLD:
+                break
+        self.range1 = round(i / (s - 1), 6)
+
+        if not self.triangular:
+            return
+        logger.debug(f"Linear channel {self.channel_id} was triangular; setting colors.")
+        self.triangular = False
+        self.color0 = QColor(0x000000)
+        self.color1 = QColor(0x000000)
+        self.color2 = DEFAULT_LINEAR_CHANNEL_COLORS[
+            self.channel_id % len(DEFAULT_LINEAR_CHANNEL_COLORS)]
+
+    def _from_histogram_triangular(self, histogram: npt.NDArray[np.int64]) -> None:
+        """Compute the dynamic range for a triangular histogram.
+
+        The dynamic range is chosen to have a predefined fraction of saturated
+        pixels on the outer and inner ends, assuming low values are transparent.
+        Colors are updated if this channel used to be linear.
+        """
+
+        s: int = histogram.size
+        # The middle one (odd histogram) or two (even) samples are the zero samples.
+        n: int = histogram.sum() - histogram[s // 2]
+        if s % 2 == 0:
+            n -= histogram[s // 2 - 1]
+        i: int = 0
+        sum_inner: int = 0
+        for i in range(1, s//2):
+            sum_inner += histogram[s//2 + i]
+            sum_inner += histogram[s//2-1 - i]
+            if sum_inner > n*LOW_HISTOGRAM_THRESHOLD:
+                break
+        self.range0 = round(i/(s//2 - 1), 6)
+
+        sum_outer: int = 0
+        for i in range(s//2):
+            sum_outer += histogram[i]
+            sum_outer += histogram[s-1 - i]
+            if sum_outer > n*HIGH_HISTOGRAM_THRESHOLD:
+                break
+        self.range1 = round(1 - i/(s//2 - 1), 6)
+
+        if self.triangular:
+            return
+        logger.debug(f"Triangular channel {self.channel_id} was linear; setting colors.")
+        self.triangular = True
+        self.color1 = QColor(0x000000)
+        self.color0, self.color2 = DEFAULT_TRIANGULAR_CHANNEL_COLORS[
+            self.channel_id % len(DEFAULT_TRIANGULAR_CHANNEL_COLORS)]
 
     def to_struct(self) -> dict[str, Any]:
         """Create a serializable structure containing all the data."""

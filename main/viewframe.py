@@ -188,7 +188,7 @@ class ViewFrame(QFrame):
         """Sets the VolumeImage given as the volume mapper's input."""
 
         self.v_mapper.SetInputConnection(
-            volume.get_vtk_image().GetOutputPort()
+            volume.vtk_image().GetOutputPort()
         )
         self._current_volume_image = volume
         logger.debug("Added volume data to mapper.")
