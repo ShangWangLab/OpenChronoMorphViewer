@@ -424,10 +424,12 @@ class VolumeImage:
         assert self.header is not None, "You need to call 'read_header' first."
         return 1.5 * np.max(self.scale * self.dims[1:]) / 2
 
-    def histogram(self, i_chan: int) -> npt.NDArray[np.int64]:
+    def histogram(self, i_chan: int, step: int = 4) -> npt.NDArray[np.int64]:
         """Compute the histogram for a certain channel.
 
         :param i_chan: The index of the channel for which to compute the histogram.
+        :param step: Accelerate histogram estimation by counting an evenly
+        spaced subset of the pixels with a stride length of `step` voxels.
         :return: Histogram counts for each possible value in the volume for the
         channel in question.
         """
@@ -443,4 +445,4 @@ class VolumeImage:
         #   return np.histogram(self.image[:, :, :, i_chan],
         #                       bins=min(100000, int(high - low + 1)),
         #                       range=(low, high))[0]
-        return np.histogram(self.image[:, :, :, i_chan], bins=bins)[0]
+        return np.histogram(self.image[::step, ::step, ::step, i_chan], bins=bins)[0]
