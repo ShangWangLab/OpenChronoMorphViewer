@@ -84,7 +84,7 @@ def tree_apply(tree: list[Any], func: Callable[[Any], None]) -> None:
     """
 
     for leaf in tree:
-        if type(leaf) == list:
+        if type(leaf) is list:
             tree_apply(leaf, func)
         else:
             func(leaf)
@@ -165,11 +165,11 @@ class Scene:
             if item is None:
                 return
             scene_item = item.scene_item
-            if type(scene_item) == ImageChannel:
+            if type(scene_item) is ImageChannel:
                 self.delete_channel(scene_item)
-            elif type(scene_item) == ClippingPlane:
+            elif type(scene_item) is ClippingPlane:
                 self.delete_plane(scene_item)
-            elif type(scene_item) == ControlPoint:
+            elif type(scene_item) is ControlPoint:
                 self.clipping_spline.delete_ctrl_pt(scene_item)
 
         self.ui.action_delete_item.triggered.connect(on_delete_item)
@@ -222,7 +222,7 @@ class Scene:
 
         def on_place_control_point(_: bool = False) -> None:
             click_pos: tuple[int, int] = self.view_frame.interactor.GetEventPosition()
-            success: bool = volume_picker.Pick(*click_pos, 0, self.view_frame.renderer)
+            success: int = volume_picker.Pick(*click_pos, 0, self.view_frame.renderer)
             if success:
                 pos: tuple[float, float, float] = volume_picker.GetPickPosition()
                 self.clipping_spline.add_ctrl_pt(Vec3(*pos))
@@ -260,13 +260,15 @@ class Scene:
 
         for i_chan in range(v.n_channels()):
             chan: ImageChannel = self.image_channels[i_chan]
+            chan.from_histogram(v.histogram(i_chan))
             if not chan.exists:
                 self.new_channel()
-            chan.from_histogram(v.histogram(i_chan))
-            if chan.checked:
+            elif chan.checked:
                 chan.update_v_prop(self.view_frame)
             else:
+                # Calls `chan.update_v_prop` indirectly.
                 chan.set_checked(True)
+        # Render again just in case it hasn't happened already.
         logger.debug("_adjust_channels:VTK_render()")
         self.view_frame.vtk_render()
 
@@ -318,7 +320,7 @@ class Scene:
         for i in range(self.ui.scene_list.count()):
             list_item = self.ui.scene_list.item(i)
             if list_item is item:
-                if type(list_item.scene_item) == ClippingPlane:
+                if type(list_item.scene_item) is ClippingPlane:
                     break
                 list_item.scene_item.update_visibility(self.view_frame)
                 logger.debug("_on_item_changed:VTK_render()")
@@ -464,6 +466,7 @@ permitted by the visualization toolkit (VTK).")
             row = self.ui.scene_list.row(next_chan.list_widget)
         chan.scene_list_insert(self.ui.scene_list, row)
         self.ui.scene_list.setCurrentItem(chan.list_widget)
+        chan.set_checked(True)
         chan.update_v_prop(self.view_frame)
         logger.debug("new_channel:VTK_render()")
         self.view_frame.vtk_render()
@@ -559,7 +562,7 @@ you'll have no way to get another!")
         # worry about potential complications.
         self.ui.scene_list.setCurrentItem(None)
 
-        if type(scene_struct) != list:
+        if type(scene_struct) is not list:
             return [f"Scene should be a list of items, not {type(scene_struct)}"]
 
         # Unique element such as the Camera shouldn't exist more than once.
@@ -571,7 +574,7 @@ you'll have no way to get another!")
         new_clipping_spline_struct: Optional[Any] = None
         # Now all of those new objects need to be reinitialized from the scene_struct.
         for item_struct in scene_struct:
-            if type(item_struct) != dict:
+            if type(item_struct) is not dict:
                 errors.append(f"Scene items must be objects, not {type(item_struct)}")
                 continue
             t = item_struct["type"]
