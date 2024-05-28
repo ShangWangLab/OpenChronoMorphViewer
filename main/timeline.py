@@ -118,7 +118,8 @@ class Timeline:
     def set_file_paths(
             self,
             file_paths: list[str],
-            progress_callback: Optional[Callable[[int], bool]] = None) -> list[FileError]:
+            progress_callback: Optional[Callable[[int], bool]] = None
+            ) -> list[FileError]:
         """Set up the volumes given a list of files, one for each volume.
 
         This may be a slow method call since, potentially, thousands of
@@ -140,7 +141,8 @@ class Timeline:
         for i, v in enumerate(volumes):
             error_msg = v.read_header()
             if error_msg is not None:
-                logger.debug(f"Error read volume[{i}] at '{v.path}': {error_msg[0]}")
+                logger.debug(
+                    f"Error read volume[{i}] at '{v.path}': {error_msg[0]}")
                 # Note the error and flag the volume for removal.
                 file_errors.append(error_msg)
                 volume_error_indices.append(i)
@@ -179,8 +181,9 @@ class Timeline:
         with self.load_lock:
             if len(volumes) > 0:
                 # The "open" operation was successful.
-                # Explicitly unload any old volumes so their locks work correctly
-                # to prevent freeing a volume that is in active use by another thread.
+                # Explicitly unload any old volumes so their locks work
+                # correctly to prevent freeing a volume that is in active use by
+                # another thread.
                 for v in self.volumes:
                     v.unload()
                 self.volumes = volumes
@@ -232,7 +235,7 @@ class Timeline:
         return self.volumes[index]
 
     def _load_volume(self, index: int) -> None:
-        """Loads the volume at the index specified into memory.
+        """Load the volume at the index specified into memory.
 
         The memory usage is checked against the target and unloading of
         less valuable volumes is performed if necessary.
@@ -257,8 +260,10 @@ class Timeline:
                 memory_recovered = v.estimate_memory()
                 v.unload()
                 self.memory_used -= memory_recovered
-                logger_load.debug(f"Unloaded volume G{v.group_index}T{v.time_index} \
-last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes.")
+                logger_load.debug(
+                    f"Unloaded volume G{v.group_index}T{v.time_index} last "
+                    f"accessed at {v.access_time:.3f} and recovered "
+                    f"{memory_recovered:0.2g} bytes.")
 
             error_message = vol.load()
             if error_message is not None:
@@ -266,7 +271,7 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
             logger_load.info(f"Loaded {index}.")
 
     def unload_volume(self, index: int) -> None:
-        """Unloads the volume at 'index'."""
+        """Unload the volume at 'index'."""
 
         assert self, "You need to call set_file_paths first."
 
@@ -276,8 +281,9 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
             self.memory_used -= v.estimate_memory()
 
     def get_prev_group_index(self) -> int:
-        """The index of the volume with a group index less than the current group
-        index and the closest matching phase. The lower index breaks ties."""
+        """The index of the volume with a group index less than the current
+        group index and the closest matching phase. The lower index breaks ties.
+        """
 
         assert self, "You need to call set_file_paths first."
 
@@ -297,13 +303,14 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 smallest_diff = diff
                 i_best = i
             i -= 1
-        logger.debug(f"Prev. to group index {group_index} from i = {self.index} to {i_best} and phase = "
-                     f"{phase} to best match of {self.volumes[i_best].phase()}")
+        logger.debug(f"Prev. to group index {group_index} from "
+                     f"i = {self.index} to {i_best} and phase = {phase} to "
+                     f"best match of {self.volumes[i_best].phase()}")
         return i_best
 
     def get_next_group_index(self) -> int:
-        """The index of the volume with a group index less than the current group
-        index and the closest matching phase, if available, otherwise the
+        """The index of the volume with a group index less than the current
+        group index and the closest matching phase, if available, otherwise the
         lowest-indexed volume.
 
         The index of the first volume with a group index greater than the
@@ -332,12 +339,14 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 smallest_diff = diff
                 i_best = i
             i += 1
-        logger.debug(f"Next to group index {group_index} from i = {self.index} to {i_best} and phase = "
-                     f"{phase} to best match of {self.volumes[i_best].phase()}")
+        logger.debug(f"Next to group index {group_index} from i = {self.index} "
+                     f"to {i_best} and phase = {phase} to best match of "
+                     f"{self.volumes[i_best].phase()}.")
         return i_best
 
     def get_first_group_index(self) -> int:
-        """The lowest index of the volume with a group index equal to the current group."""
+        """The lowest index of the volume with a group index equal to the
+        current group."""
 
         assert self, "You need to call set_file_paths first."
 
@@ -347,12 +356,14 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
         group_index = self.volumes[i].group_index
         while i > 0 and group_index == self.volumes[i-1].group_index:
             i -= 1
-        logger.debug(f"First to group index {group_index} from i = {self.index} to {i}, "
-                     f"G{self.volumes[i].group_index}T{self.volumes[i].time_index}")
+        logger.debug(
+            f"First to group index {group_index} from i = {self.index} to {i}, "
+            f"G{self.volumes[i].group_index}T{self.volumes[i].time_index}")
         return i
 
     def get_last_group_index(self) -> int:
-        """The highest index of the volume with a group index equal to the current group."""
+        """The highest index of the volume with a group index equal to the
+        current group."""
 
         assert self, "You need to call set_file_paths first."
 
@@ -362,8 +373,9 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
         group_index = self.volumes[i].group_index
         while i < len(self.volumes) - 1 and group_index == self.volumes[i+1].group_index:
             i += 1
-        logger.debug(f"Last to group index {group_index} from i = {self.index} to {i}, "
-                     f"G{self.volumes[i].group_index}T{self.volumes[i].time_index}")
+        logger.debug(
+            f"Last to group index {group_index} from i = {self.index} to {i}, "
+            f"G{self.volumes[i].group_index}T{self.volumes[i].time_index}")
         return i
 
     def _make_cache_priorities(self) -> None:
@@ -385,10 +397,10 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
         forward_distances = relative_index % len(self.volumes)
         backward_distances = (-relative_index) % len(self.volumes)
 
-        # The multiplier on the forward distance is called the "forward
-        # bias". It is approximately the number of forward-looking volumes
-        # that go ahead of each backward-looking volume in the queue.
-        # The addition of 1 smooths the metric a little and prevents division by 0.
+        # The multiplier on the forward distance is called the "forward bias".
+        # It is approximately the number of forward-looking volumes that go
+        # ahead of each backward-looking volume in the queue. The addition of 1
+        # smooths the metric a little and prevents division by 0.
         cache_priorities = 4 / (1 + forward_distances) + 1 / (1 + backward_distances)
 
         self.indices_by_cache_priority = list(range(len(self.volumes)))
@@ -456,20 +468,23 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
 
                 if self.memory_used >= self.memory_target:
                     # The memory is full. Check again later.
-                    logger_cache.info(f"Memory full: {self.memory_used:0.2g}/{self.memory_target:0.2g}.")
+                    logger_cache.info(f"Memory full: {self.memory_used:0.2g}/"
+                                      f"{self.memory_target:0.2g}.")
                     self._cache_daemon_sleep()
                     continue
 
                 for i in self.indices_by_cache_priority:
                     v: VolumeImage = self.volumes[i]
                     if not v.is_loaded():
-                        logger_cache.info(f"Caching volume {i}, memory is at \
-{self.memory_used:0.2g}/{self.memory_target:0.2g}..")
+                        logger_cache.info(
+                            f"Caching volume {i}... Memory: "
+                            f"{self.memory_used:0.2g}/"
+                            f"{self.memory_target:0.2g}.")
                         with self.load_lock:
                             v.load()
                             self.memory_used += v.estimate_memory()
-                        logger_cache.info(f"Caching volume {i} done. Added \
-{v.estimate_memory():0.2g} memory.")
+                        logger_cache.info(f"Caching volume {i} done. Added "
+                                          f"{v.estimate_memory():0.2g} memory.")
                         break
                 else:
                     # No volume worth loading. Check again later.
@@ -500,8 +515,9 @@ last accessed at {v.access_time:.3f} and recovered {memory_recovered:0.2g} bytes
                 logger.info(f"Check memory: volumes[{i}] is loaded.")
                 n_loaded += 1
                 actual_memory_used += v.estimate_memory()
-        logger.info(f"Check memory: {n_loaded} volumes are loaded taking \
-{actual_memory_used:0.2g} as compared to {self.memory_used:0.2g} tallied.")
+        logger.info(f"Check memory: {n_loaded} volumes are loaded taking "
+                    f"{actual_memory_used:0.2g} as compared to "
+                    f"{self.memory_used:0.2g} tallied.")
         return n_loaded, actual_memory_used
 
     def extreme_bounds(self) -> ImageBounds:
