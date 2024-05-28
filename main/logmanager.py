@@ -61,6 +61,12 @@ from io import TextIOWrapper
 import tempfile
 from typing import Optional
 
+from PyQt5.QtCore import (
+    QMessageLogContext,
+    QtMsgType,
+    qInstallMessageHandler,
+)
+
 logger = logging.getLogger(__name__)
 
 LOG_DIR: str = os.path.join(tempfile.gettempdir(), "OCMV_logs")
@@ -112,6 +118,7 @@ class LogManager:
             level=logging.DEBUG
         )
         logger.info("Logging initialized.")
+        qInstallMessageHandler(qt_message_handler)
 
     def start_fault_handler(self) -> None:
         """Make a log file specifically for reporting seg-fault tracebacks."""
@@ -140,3 +147,26 @@ fault logging is disabled: {e}.")
         except OSError as e:
             logger.exception(f"Failed to close the seg-fault file: {e}.")
         logging.shutdown()
+
+
+def qt_message_handler(mode: QtMsgType, context: QMessageLogContext,
+                       message: Optional[str]) -> None:
+    """Direct all Qt messages to the log file."""
+
+    if context.function is None:
+        q_logger = logging.getLogger("Qt")
+        fmt_message = f'"{message}"'
+    else:
+        q_logger = logging.getLogger(context.function + " via Qt")
+        fmt_message = f'"{message}", on line {context.line} in {context.file}'
+
+    if mode == QtMsgType.QtDebugMsg:
+        q_logger.debug(fmt_message)
+    elif mode == QtMsgType.QtWarningMsg:
+        q_logger.warning(fmt_message)
+    elif mode == QtMsgType.QtCriticalMsg:
+        q_logger.critical(fmt_message)
+    elif mode == QtMsgType.QtFatalMsg:
+        q_logger.error(fmt_message)
+    else:
+        q_logger.info(fmt_message)
