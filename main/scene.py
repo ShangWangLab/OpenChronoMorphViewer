@@ -116,7 +116,6 @@ class Scene:
         self.last_save_path: str = ""
         self.last_keyframe_path: str = ""
         self.last_volume: Optional[VolumeImage] = None
-        self.channel_adjustment_thread: Optional[Thread] = None
 
         # Make all the possible channels, but only list one initially.
         self.image_channels: list[ImageChannel] = [
@@ -230,34 +229,17 @@ class Scene:
         self.ui.action_place_control_point.triggered.connect(on_place_control_point)
         self.ui.action_place_control_point.setShortcut("P")
 
-        self.ui.action_adjust_channels.triggered.connect(self.start_adjust_channels)
+        self.ui.action_adjust_channels.triggered.connect(self.adjust_channels)
         self.ui.action_adjust_channels.setShortcut("Ctrl+E")
 
-    def start_adjust_channels(self, _: bool = False) -> None:
+    def adjust_channels(self, _: bool = False) -> None:
         """Update the channel display ranges to match the histogram of the
-        currently visible volume.
-
-        Compute the histogram in a new thread, since that might take a while,
-        and is usually called from the UI thread. Returns without starting a new
-        thread if a previous thread is already running.
-        """
+        currently visible volume."""
 
         v: VolumeImage = self.last_volume
         if v is None:
             logger.debug("Cannot adjust channels because there is no volume.")
             return
-        if (self.channel_adjustment_thread is not None
-                and self.channel_adjustment_thread.is_alive()):
-            logger.debug("A channel adjuster is already running. Abort!")
-            return
-        logger.debug("Starting a new channel adjustment thread.")
-        self.channel_adjustment_thread = Thread(target=self._adjust_channels,
-                                                args=(v,))
-        self.channel_adjustment_thread.start()
-
-    def _adjust_channels(self, v: VolumeImage) -> None:
-        """Update the channel display ranges to match the histogram of a volume."""
-
         for i_chan in range(v.n_channels()):
             chan: ImageChannel = self.image_channels[i_chan]
             chan.from_histogram(v.histogram(i_chan))
@@ -492,7 +474,7 @@ you'll have no way to get another!")
 
         self.camera.on_timeline_loaded(timeline)
         self.last_volume = timeline.get()
-        self.start_adjust_channels()
+        self.adjust_channels()
 
     def volume_update(self, volume: VolumeImage) -> None:
         """Called whenever the active volume is replaced."""
