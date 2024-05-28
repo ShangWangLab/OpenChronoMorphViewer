@@ -119,7 +119,7 @@ class AMainScene:
 
         logger.debug("From struct.")
 
-        if type(scene_struct) != list:
+        if type(scene_struct) is not list:
             return [f"Scene should be a list of items, not {type(scene_struct)}"]
 
         # Unique element such as the Camera shouldn't exist more than once.
@@ -131,7 +131,7 @@ class AMainScene:
         new_clipping_spline_struct: Optional[Any] = None
         # Now all of those new objects need to be reinitialized from the scene_struct.
         for item_struct in scene_struct:
-            if type(item_struct) != dict:
+            if type(item_struct) is not dict:
                 errors.append(f"Scene items must be objects, not {type(item_struct)}")
                 continue
             t = item_struct["type"]

@@ -412,8 +412,8 @@ class ImageChannel(SceneItem):
     def update_v_prop(self, view_frame: ViewFrame) -> None:
         """Copy the settings to VTK's volume property in the ViewFrame.
 
-        When this channel doesn't exist in the scene list, this method will
-        make the channel fully transparent.
+        When this channel doesn't exist in the scene list, make the channel
+        fully transparent.
         """
 
         v_prop = view_frame.v_prop
@@ -449,8 +449,8 @@ class ImageChannel(SceneItem):
 
         x = abs(np.linspace(-2, 2, histogram.size)) - 1
         spread_estimate = (x * histogram).sum() / histogram.sum()
-        logger.debug(f"The histogram spread estimate for channel \
-{self.channel_id} was {spread_estimate}")
+        logger.debug("The histogram spread estimate for channel "
+                     f"{self.channel_id} was {spread_estimate}")
         if spread_estimate > LINEAR_SPREAD_ESTIMATE_THRESHOLD:
             self._from_histogram_linear(histogram)
         else:

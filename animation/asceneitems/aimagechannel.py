@@ -133,8 +133,8 @@ class AImageChannel(ASceneItem):
     def update_v_prop(self, view_frame: AView) -> None:
         """Copy the settings to VTK's volume property in the ViewFrame.
 
-        When this channel doesn't exist in the scene list, this method will
-        make the channel fully transparent.
+        When this channel doesn't exist in the scene list, make the channel
+        fully transparent.
         """
 
         v_prop = view_frame.v_prop

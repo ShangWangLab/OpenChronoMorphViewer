@@ -116,6 +116,9 @@ class SceneItem:
         """Check or uncheck the associated list item.
 
         If this item hasn't been added to the list, it is ignored.
+
+        If called from a non-Qt-thread, an error will occur due to how Qt
+        processes "item select" events.
         """
 
         logger.debug(f"set_checked({checked})")
@@ -203,7 +206,7 @@ def load_str(name: str, struct: dict[str, Any], errors: list[str]) -> Optional[s
         errors.append(f"'{name}' is missing")
         return None
     value = struct[name]
-    if type(value) != str:
+    if type(value) is not str:
         errors.append(f"'{name}' must be a string")
         return None
     return value
@@ -219,7 +222,7 @@ def load_bool(name: str, struct: dict[str, Any], errors: list[str]) -> Optional[
         errors.append(f"'{name}' is missing")
         return None
     value = struct[name]
-    if type(value) != bool:
+    if type(value) is not bool:
         errors.append(f"'{name}' must be a boolean")
         return None
     return value
@@ -241,7 +244,7 @@ def load_int(name: str,
         errors.append(f"'{name}' is missing")
         return None
     value = struct[name]
-    if type(value) != int:
+    if type(value) is not int:
         errors.append(f"'{name}' must be an integer")
         return None
     if min_ is not None and value < min_ or max_ is not None and max_ < value:
@@ -293,7 +296,7 @@ def load_vec(name: str,
         errors.append(f"'{name}' is missing")
         return None
     value = struct[name]
-    if type(value) != list or len(value) != n_dims:
+    if type(value) is not list or len(value) != n_dims:
         errors.append(f"'{name}' must be a {n_dims}D vector")
         return None
     if any(type(x) not in (float, int) or math.isinf(x) or math.isnan(x) for x in value):
@@ -316,7 +319,7 @@ def load_color(name: str, struct: dict[str, Any], errors: list[str]) -> Optional
         errors.append(f"'{name}' is missing")
         return None
     value = struct[name]
-    if type(value) != str:
+    if type(value) is not str:
         errors.append(f"'{name}' must be a color string, such as #ff80a1")
         return None
     color = QColor(value)
