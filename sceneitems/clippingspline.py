@@ -24,11 +24,11 @@ from typing import (
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
-    QListWidget,
+    QListWidget, QWidget,
 )
 
 from main.errorreporter import ErrorReporter
-from main.eventfilter import EditDoneEventFilter
+from main.eventfilter import EditDoneEventFilter, MOUSE_WHEEL_EVENT_FILTER
 from main.maskupdater import MaskUpdater
 from main.timeline import Timeline
 from main.validatenumericinput import (
@@ -97,6 +97,29 @@ class ClippingSpline(SceneItem):
         assert scene_list is not None, "scene_list cannot be None."
         self.scene_list = scene_list
 
+    def update_visibility(self, view_frame: ViewFrame) -> None:
+        """Check the checkbox state and decide whether to show or hide."""
+
+        super().update_visibility(view_frame)
+
+        if self.checked:
+            # Make sure there are at least 3 control points.
+            for i in range(max(0, 3 - self.mask.count_cp())):
+                self.add_ctrl_pt()
+        self.attach_mask()
+
+    def make_settings_widget(self) -> QWidget:
+        """Create a widget to fill the scene settings field.
+
+        Called when this object is selected and becomes active.
+        """
+
+        settings_widget = super().make_settings_widget()
+        self.ui_settings.select_variable.installEventFilter(
+            MOUSE_WHEEL_EVENT_FILTER
+        )
+        return settings_widget
+
     def _update_ui(self) -> None:
         """Fill the UI editable fields with information."""
 
@@ -113,17 +136,6 @@ class ClippingSpline(SceneItem):
         self.ui_settings.checkbox_mesh.setCheckState(
             Qt.Checked if self.mask_updater.show_mesh else Qt.Unchecked  # type: ignore
         )
-
-    def update_visibility(self, view_frame: ViewFrame) -> None:
-        """Check the checkbox state and decide whether to show or hide."""
-
-        super().update_visibility(view_frame)
-
-        if self.checked:
-            # Make sure there are at least 3 control points.
-            for i in range(max(0, 3 - self.mask.count_cp())):
-                self.add_ctrl_pt()
-        self.attach_mask()
 
     def bind_event_listeners(self, view_frame: ViewFrame) -> None:
         """Creates and attaches an event handler to all the settings."""

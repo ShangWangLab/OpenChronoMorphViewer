@@ -178,22 +178,18 @@ class ImageChannel(SceneItem):
         self.INITIAL_LABEL = self._get_label()
 
         # All other channels default to linear.
-        self.triangular: bool = channel_id == 1
+        self.triangular: bool = False
         self.opacity0: float = 0.
         self.opacity1: float = 0.25
-        # The center is always black by default.
+        self.range0: float = 0.
+        self.range1: float = 1.
+        self.color0: QColor = QColor(0x000000)
         self.color1: QColor = QColor(0x000000)
-        if self.triangular:
-            self.range0: float = 0.01
-            self.range1: float = 0.45
-            self.color0, self.color2 = DEFAULT_TRIANGULAR_CHANNEL_COLORS[
-                channel_id % len(DEFAULT_TRIANGULAR_CHANNEL_COLORS)]
-        else:
-            self.range0 = round(40 / 255, 3)
-            self.range1 = round(130 / 255, 3)
-            self.color0: QColor = QColor(0x000000)
-            self.color2: QColor = DEFAULT_LINEAR_CHANNEL_COLORS[
-                channel_id % len(DEFAULT_LINEAR_CHANNEL_COLORS)]
+        self.color2: QColor = DEFAULT_LINEAR_CHANNEL_COLORS[
+            channel_id % len(DEFAULT_LINEAR_CHANNEL_COLORS)]
+
+        self.scalar_range: tuple[float, float] = (0., 1.)
+        self.exists: bool = False
 
         self.transfer_func_item: PolylineItem = PolylineItem()
         self.graphics_scene: QGraphicsScene = QGraphicsScene()
@@ -204,9 +200,6 @@ class ImageChannel(SceneItem):
         self.edit_opacity1_filter: Optional[EditDoneEventFilter] = None
         self.edit_range0_filter: Optional[EditDoneEventFilter] = None
         self.edit_range1_filter: Optional[EditDoneEventFilter] = None
-
-        self.scalar_range: tuple[float, float] = (0., 1.)
-        self.exists: bool = False
 
     def add_to_scene_list(self, scene_list: Optional[QListWidget]) -> None:
         """Make a list widget item and adds it to the scene list."""
@@ -222,6 +215,18 @@ class ImageChannel(SceneItem):
         scene_list.insertItem(row, self.list_widget)
         self.scene_list = scene_list
 
+    def remove_from_scene_list(self, scene_list: QListWidget) -> None:
+        """Remove the list item widget from the scene list."""
+
+        super().remove_from_scene_list(scene_list)
+        self.exists = False
+
+    def update_visibility(self, view_frame: ViewFrame) -> None:
+        """Check the checkbox state and decide whether to show or hide."""
+
+        super().update_visibility(view_frame)
+        self.update_v_prop(view_frame)
+
     def make_settings_widget(self) -> QWidget:
         """Create a widget to fill the scene settings field.
 
@@ -234,18 +239,6 @@ class ImageChannel(SceneItem):
         )
         self.ui_settings.graphic_transfer_func.setScene(self.graphics_scene)
         return settings_widget
-
-    def remove_from_scene_list(self, scene_list: QListWidget) -> None:
-        """Remove the list item widget from the scene list."""
-
-        super().remove_from_scene_list(scene_list)
-        self.exists = False
-
-    def update_visibility(self, view_frame: ViewFrame) -> None:
-        """Check the checkbox state and decide whether to show or hide."""
-
-        super().update_visibility(view_frame)
-        self.update_v_prop(view_frame)
 
     def _update_ui(self) -> None:
         """Fill the UI editable fields with information."""
