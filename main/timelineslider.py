@@ -241,8 +241,8 @@ class TimelineSlider:
 
         i0: int = self.timeline.get_first_group_index()
         i1: int = self.timeline.get_last_group_index()
-        logger.debug(
-            f"Add {delta} to {p}. Bounds: {i0} to {i1}. Cycles: {self.cycles_remaining}/{self.n_cycles}")
+        logger.debug(f"Add {delta} to {p}. Bounds: {i0} to {i1}. "
+                     f"Cycles: {self.cycles_remaining}/{self.n_cycles}")
 
         crossing_left_bound: bool = delta == -1 and p == i0
         crossing_right_bound: bool = delta == +1 and p == i1

@@ -76,6 +76,6 @@ cython_debug/
 # PyCharm
 .idea/
 
-# Project-specific for the Open Chrono-Morph Viewer\
+# Project-specific for Open Chrono-Morph Viewer
 ui/*.py
 ui/graphics/unused/
