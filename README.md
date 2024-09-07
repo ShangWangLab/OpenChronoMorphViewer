@@ -38,6 +38,10 @@ See [dependency-install-Windows.bat](dependency-install-Windows.bat) for an exam
 
 OCMV is designed to load 3D volumes, each in a separate NRRD file. The files can either have attached headers or run in headless mode, but the volume file must have three spatial dimensions (XYZ), with an optional channel dimension (C) ordered from fastest to slowest as CXYZ. Image values must be either unsigned 8-bit or 16-bit. Timing information can be specified via custom fields in the NRRD header.
 
+## Test dataset
+
+A test dataset for OCMV is available on [Zenodo](https://doi.org/10.5281/zenodo.13712866).
+
 ## License
 
 Open Chrono-Morph Viewer, a project for visualizing volumetric time-series.
