@@ -143,20 +143,32 @@ class VolumeImage:
             n_channels: np.int_ = self.dims[0]
             if n_channels > 4:
                 return FileError(f"{n_channels}-channel images are not supported (4 max)", self.path)
-            # XYZ voxel dimensions in microns.
-            directions: npt.NDArray[np.float64] = header["space directions"]
-            if directions.shape == (4, 3):
-                # Sometimes directions will be specified for the channel. These can be ignored.
-                directions = directions[1:, :]
-            elif directions.shape != (3, 3):
-                return FileError("The space directions are malformed", self.path)
-            if np.any(np.isinf(directions)):
-                return FileError("The space directions contain +/- infinity", self.path)
-            np.nan_to_num(directions, copy=False, nan=0)
-            # We do not attempt to interpret skew or rotation of the "space directions" matrix.
-            self.scale = np.linalg.norm(directions, axis=1)
-            if np.any(self.scale <= 0):
-                return FileError("The space directions are not positive", self.path)
+            if "space directions" in header:
+                # XYZ voxel dimensions in microns.
+                directions: npt.NDArray[np.float64] = header["space directions"]
+                if directions.shape == (4, 3):
+                    # Sometimes directions will be specified for the channel. These can be ignored.
+                    directions = directions[1:, :]
+                elif directions.shape != (3, 3):
+                    return FileError("The space directions are malformed", self.path)
+                if np.any(np.isinf(directions)):
+                    return FileError("The space directions contain +/- infinity", self.path)
+                np.nan_to_num(directions, copy=False, nan=0)
+                # We do not attempt to interpret skew or rotation of the "space directions" matrix.
+                self.scale = np.linalg.norm(directions, axis=1)
+                if np.any(self.scale <= 0):
+                    return FileError("The space directions are not positive", self.path)
+            elif "spacings" in header:
+                spacings = header["spacings"]
+                if spacings.shape == (3,):
+                    self.scale = spacings.astype(np.float64)
+                elif spacings.shape == (4,):
+                    # The channel should have a spacing of nan.
+                    self.scale = spacings[1:].astype(np.float64)
+                else:
+                    return FileError("The spacings must be specified for each axis", self.path)
+                if np.any(np.isinf(self.scale)) or np.any(np.isnan(self.scale)) or np.any(self.scale <= 0):
+                    return FileError("The spacings contain an illegal value.", self.path)
             # XYZ center offset in pixels.
             if "space origin" in header:
                 self.origin = header["space origin"]
@@ -241,7 +253,7 @@ class VolumeImage:
         """Estimate how many bytes the file will take if loaded into memory."""
 
         assert self.header is not None, "You need to call 'read_header' first."
-        return self.dtype.itemsize * int(np.product(self.dims))
+        return self.dtype.itemsize * int(np.prod(self.dims))
 
     def get_scalar_range(self) -> tuple[float, float]:
         """The lowest and highest possible values for this image data type."""
@@ -410,9 +422,9 @@ class VolumeImage:
         lower = self.origin
         upper = self.origin + self.scale * self.dims[1:]
         return ImageBounds(
-            lower[0], upper[0],
-            lower[1], upper[1],
-            lower[2], upper[2]
+            float(lower[0]), float(upper[0]),
+            float(lower[1]), float(upper[1]),
+            float(lower[2]), float(upper[2])
         )
 
     def view_scale(self) -> float:
