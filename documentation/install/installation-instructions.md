@@ -15,7 +15,8 @@ Required 3rd party Python packages
 - SciPy 1.11.1 for the "cdist" function used in the clipping spline
 - TIFFfile 2023.7.18 for parsing TIFF files
 
-See [dependency-install-Windows.bat](dependency-install-Windows.bat) for an example of the command to install all the Python dependencies.
+See [dependency-install-Windows.bat](/dependency-install-Windows.bat) for 
+an example of the command to install all the Python dependencies.
 
 ## Windows 10/11
 
