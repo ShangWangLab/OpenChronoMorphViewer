@@ -27,7 +27,7 @@ an example of the command to install all the Python dependencies.
 ## Windows 10/11
 
 ### Option #1
-A binary distribution is available for Windows. If you would like to use the binary version, just [download it](/releases/tag/Public)
+A binary distribution is available for Windows. If you would like to use the binary version, just [download it](https://github.com/ShangWangLab/OpenChronoMorphViewer/releases/tag/Public)
 and extract the zip archive anywhere. If you merely want to view files, you may stop here. However, the binary distribution cannot be used to write animations scripts; for those, you must continue to install the Python requirements along with FFmpeg.
 
 ### Option #2
