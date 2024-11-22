@@ -50,6 +50,7 @@ from PyQt5.QtWidgets import (
 from vtkmodules.vtkCommonDataModel import vtkPiecewiseFunction
 from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 
+from main.bundleutil import GFX_DIR
 from main.eventfilter import (
     EditDoneEventFilter,
     MOUSE_WHEEL_EVENT_FILTER,
@@ -164,7 +165,7 @@ class ImageChannel(SceneItem):
     Manages the transfer function.
     """
 
-    ICON_PATH: str = "ui/graphics/icon_channel.png"
+    ICON_PATH: str = GFX_DIR + "/icon_channel.png"
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Checked  # type: ignore
     UI_SETTINGS_CLASS = Ui_SettingsChannel
 

@@ -26,6 +26,7 @@ from vtkmodules.vtkInteractionWidgets import vtkOrientationMarkerWidget
 from vtkmodules.vtkRenderingAnnotation import vtkAxesActor
 from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
+from main.bundleutil import GFX_DIR
 from main.eventfilter import EditDoneEventFilter
 from main.validatenumericinput import validate_float
 from main.viewframe import ViewFrame
@@ -41,7 +42,7 @@ logger = logging.getLogger(__name__)
 class OrientationMarker(SceneItem):
     """Stores the vtkOrientationMarkerWidget and manages its UI data."""
 
-    ICON_PATH: str = "ui/graphics/icon_orientation_marker.png"
+    ICON_PATH: str = GFX_DIR + "/icon_orientation_marker.png"
     INITIAL_LABEL: str = "Orientation Marker"
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Unchecked  # type: ignore
     UI_SETTINGS_CLASS = Ui_SettingsOrientationMarker

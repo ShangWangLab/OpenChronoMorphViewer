@@ -12,27 +12,8 @@ Detailed installation instructions, demonstration videos, and
 instructions for use will be available in the manuscript, which will be
 linked here once published.
 
-## Supported Platforms
-
-- Windows 10/11
-- Ubuntu 20.04+
-- macOS 13.0+ (experienced issues on version 10.9)
-
-## Dependencies
-
-Required software:
-- [Python](https://www.python.org/downloads) version 3.11.4
-- [FFMPEG](https://ffmpeg.org/download.html) version 6.1.1 (only required for animating videos)
-
-Required 3rd party Python packages:
-- NumPy 1.25.2 for 3D data operations
-- PSutil 5.9.5 for getting the current RAM usage
-- PyNRRD 1.0.0 for the image file format (Nearly Raw Raster Data)
-- PyQt5 5.15.2.2.3 for the user interface
-- SciPy 1.11.1 for the "cdist" function
-- PyVTK 9.2.6 for volumetric rendering
-
-See [dependency-install-Windows.bat](dependency-install-Windows.bat) for an example of the command to install all the Python dependencies.
+## Installation instructions
+[Read here](documentation/install/installation-instructions.md)
 
 ## Supported file formats
 

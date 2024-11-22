@@ -35,6 +35,7 @@ from vtkmodules.vtkRenderingCore import (
     vtkTextActor,
 )
 
+from main.bundleutil import GFX_DIR
 from main.errorreporter import ErrorReporter
 from main.eventfilter import EditDoneEventFilter
 from sceneitems.sceneitem import SceneItem, load_bool, load_float
@@ -52,7 +53,7 @@ logger = logging.getLogger(__name__)
 class ScaleBar(SceneItem):
     """Stores the scale bar widget and manages its UI data."""
 
-    ICON_PATH: str = "ui/graphics/icon_scale_bar.png"
+    ICON_PATH: str = GFX_DIR + "/icon_scale_bar.png"
     INITIAL_LABEL: str = "Scale Bar"
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Unchecked  # type: ignore
     UI_SETTINGS_CLASS = Ui_SettingsScaleBar

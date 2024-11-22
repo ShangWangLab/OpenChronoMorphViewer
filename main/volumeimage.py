@@ -29,7 +29,9 @@
 
 import logging
 import math
+import os.path
 import time
+from enum import IntEnum
 from threading import Lock
 from typing import (
     Any,
@@ -40,6 +42,7 @@ from typing import (
 import nrrd  # type: ignore
 import numpy as np
 import numpy.typing as npt
+import tifffile
 from vtkmodules.vtkIOImage import vtkImageImport
 
 from main.errorreporter import FileError
@@ -56,6 +59,22 @@ class ImageBounds(NamedTuple):
     z_max: float
 
 
+class FileFormat(IntEnum):
+    UNKNOWN: int = 0
+    NRRD: int = 1
+    TIFF: int = 2
+
+
+def _file_format_from_path(path: str) -> FileFormat:
+    _, ext = os.path.splitext(path)
+    ext = ext.lower()
+    if ext == ".nrrd" or ext == ".nhdr":
+        return FileFormat.NRRD
+    if ext == ".tif" or ext == ".tiff":
+        return FileFormat.TIFF
+    return FileFormat.UNKNOWN
+
+
 class VolumeImage:
     """Stores a handle to an individual file containing image data.
 
@@ -63,8 +82,9 @@ class VolumeImage:
     """
 
     def __init__(self, path: str):
-        # Path to the NRRD or NHDR file containing the volume.
+        # Path to the file containing the volume information, and maybe also the data.
         self.path: str = path
+        self.file_format: FileFormat = _file_format_from_path(path)
 
         # The raw image data.
         self.image: Optional[npt.NDArray] = None
@@ -78,7 +98,7 @@ class VolumeImage:
         self.access_time: float = 0.
         # Used to display the volume info bar.
         self.label: str = ""
-        # The header read from the NRRD file.
+        # The header read from the NRRD file, if it is one.
         self.header: Optional[dict[str, Any]] = None
 
         self.dtype: Optional[np.dtype] = None
@@ -93,7 +113,94 @@ class VolumeImage:
         self.time_index: int = 0
         self.n_times: int = 1
 
+        self.transpose_ZCYX: bool = False
+
     def read_header(self) -> Optional[FileError]:
+        """Attempts to load metadata about this file.
+
+        Populates relevant values from the header into this object.
+        Returns an error message if the header failed to load.
+        """
+
+        if self.file_format == FileFormat.NRRD:
+            return self.read_nrrd_header()
+        if self.file_format == FileFormat.TIFF:
+            return self.read_tiff_header()
+        return FileError("Unsupported file format; only NRRD/NHDR and TIFF are supported.", self.path)
+
+    def read_tiff_header(self) -> Optional[FileError]:
+        """Attempts to load the TIFF metadata.
+
+        Populates relevant values from the header into this object.
+        Returns an error message if the header failed to load.
+        """
+
+        try:
+            logger.debug(f"Reading TIFF metadata from {self.path}...")
+            try:
+                with tifffile.TiffFile(self.path) as tif:
+                    pf = tif.pages.first
+                    n_pages = len(tif.pages)
+                    meta_imagej = tif.imagej_metadata
+            except OSError as e:
+                # Either the file doesn't exist, it's already open, or we don't have permission.
+                return FileError(f"Failed to open the file: {e}", self.path)
+
+            self.dtype = pf.dtype
+            if self.dtype not in [np.uint8, np.uint16, np.int8, np.int16]:
+                return FileError(f"Pixel data type {self.dtype} is unsupported ([u]int8, [u]int16 only)",
+                                 self.path)
+
+            # TODO: How does tifffile manage big endian images?
+
+            # [C,X,Y,Z] array size in pixels.
+            self.dims = np.ones((4,), np.int_)
+            self.dims[1] = pf.imagewidth
+            self.dims[2] = pf.imagelength
+
+            res = pf.resolution
+            self.scale[0] = 1 / res[0] if res[0] > 0. else 1.
+            self.scale[1] = 1 / res[1] if res[1] > 0. else 1.
+
+            if meta_imagej:
+                if "slices" in meta_imagej and "channels" in meta_imagej:
+                    self.dims[0] = meta_imagej["channels"]
+                    self.dims[3] = meta_imagej["slices"]
+                    self.transpose_ZCYX = True
+
+                    if self.dims[0] * self.dims[3] != pf.samplesperpixel * n_pages:
+                        return FileError("ImageJ metadata is invalid.", self.path)
+
+                if "spacing" in meta_imagej:
+                    self.scale[2] = meta_imagej["spacing"]
+
+            # Center the volume by default.
+            self.origin = -(self.scale * self.dims[1:]) / 2
+            if meta_imagej:
+                if "xorigin" in meta_imagej:
+                    self.origin[0] = (0.5 - meta_imagej["xorigin"]) * self.scale[0]
+                if "yorigin" in meta_imagej:
+                    self.origin[1] = (0.5 - meta_imagej["yorigin"]) * self.scale[1]
+                if "zorigin" in meta_imagej:
+                    self.origin[2] = (0.5 - meta_imagej["zorigin"]) * self.scale[2]
+
+            if not self.transpose_ZCYX:
+                self.dims[0] = pf.samplesperpixel
+                self.dims[3] = n_pages
+
+            if not np.all(self.dims > 0):
+                return FileError("TIFF volume dimensions are invalid.", self.path)
+            if not np.all(self.scale > 0.) or not np.all(np.isfinite(self.scale)):
+                return FileError("TIFF scale is invalid.", self.path)
+            if not np.all(np.isfinite(self.origin)):
+                return FileError("TIFF origin is invalid.", self.path)
+
+            # TODO: This is a cheap trick to make the TIFF reader work. Refactor this.
+            self.header = {}
+        except Exception as e:
+            return FileError(f"Uncaught error while parsing header: {e}", self.path)
+
+    def read_nrrd_header(self) -> Optional[FileError]:
         """Attempts to load the NRRD header file.
 
         Populates relevant values from the header into this object.
@@ -140,7 +247,7 @@ class VolumeImage:
                 return FileError(f"{self.dims.size}-D images are not supported (3- or 4-D only)", self.path)
             if self.dims.size == 3:
                 self.dims = np.concatenate((np.ones(1, np.int_), self.dims), axis=0)
-            n_channels: np.int_ = self.dims[0]
+            n_channels = self.dims[0]
             if n_channels > 4:
                 return FileError(f"{n_channels}-channel images are not supported (4 max)", self.path)
             if "space directions" in header:
@@ -259,7 +366,8 @@ class VolumeImage:
         """The lowest and highest possible values for this image data type."""
 
         assert self.header is not None, "You need to call 'read_header' first."
-        if self.dtype == np.uint8:
+        # int8 is unsupported by VTK, so the array will actually be uint8.
+        if self.dtype == np.uint8 or self.dtype == np.int8:
             return 0., 255.
         if self.dtype == np.uint16:
             return 0., 65535.
@@ -274,7 +382,7 @@ class VolumeImage:
         return int(self.dims[0])
 
     def load(self) -> Optional[FileError]:
-        """Loads the data from the NRRD file into memory.
+        """Loads the data from the associated file into memory.
 
         Returns an error message if the file was unreadable.
         """
@@ -284,51 +392,104 @@ class VolumeImage:
         with self.load_lock:
             if self.is_loaded():
                 return None
+            if self.file_format == FileFormat.NRRD:
+                return self.load_nrrd()
+            elif self.file_format == FileFormat.TIFF:
+                return self.load_tiff()
+        return self._fail_load("File format unrecognized or not supported.")
 
-            logger.info(f"Loading data from {self.path}...")
-            try:
-                # Transposing an array is slow, so we store it in the native
-                # format: [Z,Y,X,C]. The axis order needs to be inverted because
-                # we use C-style indexing rather than Fortran-style indexing.
-                self.image, header = nrrd.read(self.path, index_order="C")
-            except StopIteration:
-                # There is a bug in the NRRD reader library where empty
-                # files will cause the reader to crash with this error.
-                return self._fail_load("Blank or corrupt file")
-            except ValueError as e:
-                # The NRRD reader cannot handle numeric fields holding text.
-                return self._fail_load(f"Invalid header field: {e}")
-            except FloatingPointError as e:
-                return self._fail_load(f"Bad numeric data in header field: {e}")
-            except nrrd.NRRDError as e:
-                return self._fail_load(f"Invalid NRRD file: {e}")
-            except OSError as e:
-                # Either the file doesn't exist, it's already open, or we don't have permission.
-                return self._fail_load(f"Failed to open the file: {e}")
+    def load_tiff(self) -> Optional[FileError]:
+        """Loads the data from the TIFF file into memory.
 
-            assert self.image is not None, "The NRRD reader failed silently and returned None."
+        Returns an error message if the file was unreadable.
+        """
 
-            # Check that the data is at least the same shape as what we expected.
-            # It is still possible for a different file to be loaded than the one whose header was read,
-            # but at least it will be the same size and data type.
-            if (self.header["type"] != header["type"]
-                    or self.header["sizes"].shape != header["sizes"].shape
-                    or np.any(self.header["sizes"] != header["sizes"])):
-                return self._fail_load("File has changed since the header was initially read")
+        logger.info(f"Loading TIFF data from {self.path}...")
+        try:
+            self.image = tifffile.imread(self.path)
+        except OSError as e:
+            # Either the file doesn't exist, it's already open, or we don't have permission.
+            return self._fail_load(f"Failed to open the file: {e}")
+        except Exception as e:
+            return self._fail_load(f"Failed parse the TIFF for unknown reason: {e}")
 
-            # Channel-less images need to reshaped to have one channel.
-            if len(self.image.shape) == 3:
-                self.image = self.image.reshape(self.dims)
-            # The endianness needs to be native for VTK to display properly.
-            if self.switch_endian:
-                self.image.byteswap(True)
-            self._make_vtk_image()
+        assert self.image is not None, "The TIFF reader failed silently and returned None."
+
+        if self.image.size != self.dims.prod():
+            self._fail_load("File dimensions do not match the initially read metadata")
+        if self.dtype != self.image.dtype:
+            self._fail_load("File data type does not match the initially read metadata")
+        # VTK lacks support for int8, so we map it from [-128, 127] to [0, 255].
+        if self.dtype == np.int8:
+            self.image = self.image.astype(np.uint8)
+            self.image += 128
+        # TIFF files often list the channels as separate images. VTK requires them interspersed.
+        if self.transpose_ZCYX:
+            self.image = self.image.reshape((self.dims[3], self.dims[0], self.dims[1], self.dims[2]))
+            # Transpose returns a view into the original array; copy to make it real.
+            self.image = self.image.transpose((0, 2, 3, 1)).copy()
+        else:
+            self.image = self.image.reshape(self.dims[::-1])
+        # The endianness needs to be native for VTK to display properly.
+        if self.switch_endian:
+            self.image.byteswap(True)
+        self._make_vtk_image()
+
+        # No error message to report.
+        return None
+
+    def load_nrrd(self) -> Optional[FileError]:
+        """Loads the data from the NRRD file into memory.
+
+        Returns an error message if the file was unreadable.
+        """
+
+        logger.info(f"Loading NRRD data from {self.path}...")
+        try:
+            # Transposing an array is slow, so we store it in the native
+            # format: [Z,Y,X,C]. The axis order needs to be inverted because
+            # we use C-style indexing rather than Fortran-style indexing.
+            self.image, header = nrrd.read(self.path, index_order="C")
+        except StopIteration:
+            # There is a bug in the NRRD reader library where empty
+            # files will cause the reader to crash with this error.
+            return self._fail_load("Blank or corrupt file")
+        except ValueError as e:
+            # The NRRD reader cannot handle numeric fields holding text.
+            return self._fail_load(f"Invalid header field: {e}")
+        except FloatingPointError as e:
+            return self._fail_load(f"Bad numeric data in header field: {e}")
+        except nrrd.NRRDError as e:
+            return self._fail_load(f"Invalid NRRD file: {e}")
+        except OSError as e:
+            # Either the file doesn't exist, it's already open, or we don't have permission.
+            return self._fail_load(f"Failed to open the file: {e}")
+        except Exception as e:
+            return self._fail_load(f"Failed parse the NRRD for unknown reasons: {e}")
+
+        assert self.image is not None, "The NRRD reader failed silently and returned None."
+
+        # Check that the data is at least the same shape as what we expected.
+        # It is still possible for a different file to be loaded than the one whose header was read,
+        # but at least it will be the same size and data type.
+        if (self.header["type"] != header["type"]
+                or self.header["sizes"].shape != header["sizes"].shape
+                or np.any(self.header["sizes"] != header["sizes"])):
+            return self._fail_load("File has changed since the header was initially read")
+
+        # Channel-less images need to reshaped to have one channel.
+        if len(self.image.shape) == 3:
+            self.image = self.image.reshape(self.dims[::-1])
+        # The endianness needs to be native for VTK to display properly.
+        if self.switch_endian:
+            self.image.byteswap(True)
+        self._make_vtk_image()
 
         # No error message to report.
         return None
 
     def _fail_load(self, message: str) -> FileError:
-        """Sets up the image with a default array when loading it fails.
+        """Set up the image with a default array when loading fails.
 
         Returns an error message object to be passed along.
         """
@@ -342,7 +503,7 @@ class VolumeImage:
 
         self._vtk_image = vtkImageImport()
         self._vtk_image.SetImportVoidPointer(self.image.ravel())
-        if self.dtype == np.uint8:
+        if self.dtype == np.uint8 or self.dtype == np.int8:
             self._vtk_image.SetDataScalarTypeToUnsignedChar()
         elif self.dtype == np.uint16:
             self._vtk_image.SetDataScalarTypeToUnsignedShort()
@@ -454,7 +615,9 @@ class VolumeImage:
         bins = np.arange(int(low), int(high) + 2)
         # Alternatively, we could limit the number of bins and extend this to
         # floating-point-valued images with a range specification:
-        #   return np.histogram(self.image[:, :, :, i_chan],
+        #   return np.histogram(self.image[...],
         #                       bins=min(100000, int(high - low + 1)),
         #                       range=(low, high))[0]
-        return np.histogram(self.image[::step, ::step, ::step, i_chan], bins=bins)[0]
+        slices = [slice(None, None, step) if self.image.shape[i] > step else slice(None)
+                  for i in range(3)]
+        return np.histogram(self.image[*slices, i_chan], bins=bins)[0]

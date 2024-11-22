@@ -29,23 +29,25 @@ Required 3rd party packages:
 * psutil 5.9.5 - for getting the current RAM usage
 * PyNRRD 1.0.0 (Nearly Raw Raster Data) - for the image file format
 * PyQt5 5.15.2.2.3 - for the user interface
-* SciPy 1.11.1 - for the "cdist" function
 * PyVTK 9.2.6 - for volumetric rendering
+* SciPy 1.11.1 - for the "cdist" function
+* tifffile 2023.7.18 - for reading 3D TIFF files
 
 Required 3rd party software:
 * FFmpeg 6.1.1 (and added to PATH) - for compiling animation videos
 
 Tested on:
 * Window 10 and 11
-* macOS 12.6.0
+* macOS 13.0 (experienced issues on 12.6.0)
+* Ubuntu 20.04
 """
 
 import logging
 
-from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 
+from main.bundleutil import IS_BUNDLED
 from main.logmanager import LogManager
 
 logger = logging.getLogger(__name__)
@@ -53,6 +55,9 @@ logger = logging.getLogger(__name__)
 
 def compile_ui() -> None:
     """Compile Qt's UI files to make importable user interfaces in Python."""
+
+    # This will not exist in a bundle, so don't import it at the top level.
+    from PyQt5 import uic
 
     packages = [
         "main_window",
@@ -84,11 +89,14 @@ def main() -> None:
             QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
         if hasattr(Qt, "AA_UseHighDpiPixmaps"):
             QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-        
-        compile_ui()
+        if IS_BUNDLED:
+            logger.info("Running from a bundled application.")
+        else:
+            logger.info("Running from the installed Python runtime.")
+            compile_ui()
 
-        # We need to import this *after* compiling the UI files or the imports
-        # will not be up-to-date.
+        # We need to import this *after* compiling the UI files or the generated
+        # Python files will not be up-to-date for following imports.
         from main.mainwindow import MainWindow
 
         app = QApplication([])
@@ -98,7 +106,7 @@ def main() -> None:
         app.exec()
         logger.info("Application exited correctly.")
     except:
-        logger.exception(f"UI thread crashed")
+        logger.exception("UI thread crashed")
     log_manager.end()
 
 

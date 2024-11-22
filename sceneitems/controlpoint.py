@@ -33,6 +33,7 @@ from vtkmodules.vtkRenderingCore import (
     vtkPolyDataMapper,
 )
 
+from main.bundleutil import GFX_DIR
 from main.viewframe import ViewFrame
 from sceneitems.planecontroller import PlaneController
 from sceneitems.sceneitem import Vec3
@@ -54,7 +55,7 @@ class ControlPoint(PlaneController):
     instead intended for use with a smooth clipper.
     """
 
-    ICON_PATH: str = "ui/graphics/icon_control_point.png"
+    ICON_PATH: str = GFX_DIR + "/icon_control_point.png"
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Checked  # type: ignore
 
     def __init__(self,

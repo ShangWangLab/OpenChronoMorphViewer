@@ -27,6 +27,7 @@ from PyQt5.QtWidgets import (
     QListWidget, QWidget,
 )
 
+from main.bundleutil import GFX_DIR
 from main.errorreporter import ErrorReporter
 from main.eventfilter import EditDoneEventFilter, MOUSE_WHEEL_EVENT_FILTER
 from main.maskupdater import MaskUpdater
@@ -60,7 +61,7 @@ class ClippingSpline(SceneItem):
     volume mask to hide voxels on the other side of the mask.
     """
 
-    ICON_PATH: str = "ui/graphics/icon_smooth_surface.png"
+    ICON_PATH: str = GFX_DIR + "/icon_smooth_surface.png"
     INITIAL_LABEL: str = "Clipping Spline"
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Unchecked  # type: ignore
     UI_SETTINGS_CLASS = Ui_SettingsClippingSpline

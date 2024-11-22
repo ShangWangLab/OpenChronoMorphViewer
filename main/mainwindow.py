@@ -80,7 +80,7 @@ from ui.main_window import Ui_MainWindow
 logger = logging.getLogger(__name__)
 
 
-OCMV_VERSION: str = "0.9"
+OCMV_VERSION: str = "1.0"
 PROJECT_URL: str = "https://github.com/ShangWangLab/OpenChronoMorphViewer"
 ACKNOWLEDGEMENTS: str = """\
 Funded by the National Institutes of Health (R35GM142953).
@@ -192,10 +192,13 @@ class MainWindow(QMainWindow):
         """
 
         file_paths, file_filter = QFileDialog.getOpenFileNames(
-            self,                                                    # Parent.
-            "Select one or more volumes to load",                    # Caption.
-            self.CWD_path,                                           # Current working directory.
-            "Nearly Raw Raster Data (*.nrrd *.nhdr);;Any file (*)")  # File filter options.
+            self,                                        # Parent.
+            "Select one or more volumes to load",        # Caption.
+            self.CWD_path,                               # Current working directory.
+            ("Nearly Raw Raster Data (*.nrrd *.nhdr);;"  # File filter options.
+                "TIFF (*.tif *.tiff);;"
+                "Any file (*)")
+        )
         if not file_paths:
             return
 

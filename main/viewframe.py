@@ -38,7 +38,7 @@ from PyQt5.QtWidgets import (
     QFrame,
     QHBoxLayout,
 )
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor  # type: ignore
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor  # type: ignore
 from vtkmodules.vtkCommonCore import vtkCommand, vtkObject
 from vtkmodules.vtkIOImage import vtkImageWriter, vtkPNGWriter, vtkJPEGWriter, vtkTIFFWriter
 from vtkmodules.vtkInteractionStyle import vtkInteractorStyleTrackballCamera

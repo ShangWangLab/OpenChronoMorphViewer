@@ -24,6 +24,7 @@ from PyQt5.QtCore import Qt
 from vtkmodules.vtkCommonCore import vtkCommand
 from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
+from main.bundleutil import GFX_DIR
 from main.viewframe import ViewFrame
 if TYPE_CHECKING:
     from main.scene import Scene
@@ -36,7 +37,7 @@ logger = logging.getLogger(__name__)
 class ClippingPlane(PlaneController):
     """Stores the VTK plane widget and manages its UI data."""
 
-    ICON_PATH: str = "ui/graphics/icon_clipping_plane.png"
+    ICON_PATH: str = GFX_DIR + "/icon_clipping_plane.png"
     INITIAL_CHECK_STATE: Qt.CheckState = Qt.Unchecked  # type: ignore
 
     def __init__(self,

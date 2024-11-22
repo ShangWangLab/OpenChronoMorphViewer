@@ -26,6 +26,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget
 from vtkmodules.vtkRenderingCore import vtkCamera
 
+from main.bundleutil import GFX_DIR
 from main.eventfilter import (
     EditDoneEventFilter,
     MOUSE_WHEEL_EVENT_FILTER,
@@ -68,7 +69,7 @@ def _find_view_up(up0: Vec3, axis: int) -> Vec3:
 class Camera(SceneItem):
     """Stores the VTK camera object and manages its UI data."""
 
-    ICON_PATH: str = "ui/graphics/icon_camera.png"
+    ICON_PATH: str = GFX_DIR + "/icon_camera.png"
     INITIAL_LABEL: str = "Camera"
     INITIAL_CHECK_STATE = None
     UI_SETTINGS_CLASS = Ui_SettingsCamera
