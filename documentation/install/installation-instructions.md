@@ -90,7 +90,8 @@ rm get-pip.py
 ```
 5. Install the required Python libraries. Sometimes, an existing library will cause installation issues, so we recommend forcibly reinstalling them.
 ```bash
-python3.11 -m pip install --force-reinstall numpy psutil pynrrd pyqt5 scipy vtk
+python3.11 -m pip install --force-reinstall numpy psutil pynrrd pyqt5 scipy 
+vtk tifffile
 ```
 6. Clone the OCMV GitHub repository to your computer and extract the ZIP file, if necessary.
 ![How to clone this repository](GitHub_clone_repository.png)
