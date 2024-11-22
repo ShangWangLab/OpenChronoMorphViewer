@@ -1,2 +1,2 @@
-pip install numpy psutil pynrrd pyqt5 scipy vtk
+pip install numpy psutil pynrrd pyqt5 scipy vtk tifffile
 pause

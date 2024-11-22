@@ -2,6 +2,12 @@
 OCMV requires a standard installation of Python, along with some 3rd party libraries. Animation frames can be made without FFmpeg, but they cannot be compiled into a video file through OCMV without FFmpeg installed and added to the environment variables.
 This installation process should take 5-10 minutes.
 
+[Go to Windows 10/11](#windows-1011)
+
+[Go to macOs 13.0+](#macos-130)
+
+[Go to Ubuntu 20.04+](#ubuntu-2004)
+
 ## Required software
 - Python version 3.11.4
 - FFmpeg version 6.1.1 (only required for animating videos)
@@ -90,7 +96,8 @@ rm get-pip.py
 ```
 5. Install the required Python libraries. Sometimes, an existing library will cause installation issues, so we recommend forcibly reinstalling them.
 ```bash
-python3.11 -m pip install --force-reinstall numpy psutil pynrrd pyqt5 scipy vtk
+python3.11 -m pip install --force-reinstall numpy psutil pynrrd pyqt5 scipy 
+vtk tifffile
 ```
 6. Clone the OCMV GitHub repository to your computer and extract the ZIP file, if necessary.
 ![How to clone this repository](GitHub_clone_repository.png)
