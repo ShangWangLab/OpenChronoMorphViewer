@@ -27,7 +27,7 @@ an example of the command to install all the Python dependencies.
 ## Windows 10/11
 
 ### Option #1
-A binary distribution is available for Windows. If you would like to use the binary version, just [download it](https://github.com/ShangWangLab/OpenChronoMorphViewer/releases/tag/Public)
+A binary distribution is available for Windows. If you would like to use the binary version, just [download OCMV-1.0-Win64](https://github.com/ShangWangLab/OpenChronoMorphViewer/releases/tag/Public)
 and extract the zip archive anywhere. If you merely want to view files, you may stop here. However, the binary distribution cannot be used to write animations scripts; for those, you must continue to install the Python requirements along with FFmpeg.
 
 ### Option #2
@@ -78,6 +78,12 @@ Run OCMV:
 1.	Open the OCMV repository previously downloaded and double-click on "run-OCMV-macOS.command" to start the software.
 
 ## Ubuntu 20.04+
+
+### Option #1
+A binary distribution is available for Ubuntu 20.04 or later. If you would like to use the binary version, just [download OCMV-1.0-Ubuntu-20.04](https://github.com/ShangWangLab/OpenChronoMorphViewer/releases/tag/Public)
+and extract the tar gzip archive anywhere. If you merely want to view files, you may stop here. However, the binary distribution cannot be used to write animations scripts; for those, you must continue to install the Python requirements along with FFmpeg.
+
+### Option #2
 Install Python with dependencies:
 1. Open a terminal.
 2. Add the deadsnakes PPA, which provides specific version builds of Python for Ubuntu.

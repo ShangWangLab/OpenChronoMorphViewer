@@ -12,9 +12,10 @@ a = Analysis(
 		('ui/graphics/*.ico', 'ui/graphics'),
 	],
     hiddenimports=['vtkmodules', 'vtkmodules.all', 'vtkmodules.qt.QVTKRenderWindowInteractor', 'vtkmodules.util', 'vtkmodules.util.numpy_support', 'vtkmodules.numpy_interface', 'vtkmodules.numpy_interface.dataset_adapter'],
-	excludes=['IPython', 'PIL', 'PyQt5.uic', 'PyQt6', 'Pythonwin', 'abc', 'alabaster', 'asyncio', 'babel', 'bdb', 'calendar', 'certifi', 'cffi', 'charset_normalizer', 'cmd', 'code', 'codeop', 'contourpy', 'cryptography', 'csv', 'decimal', 'distutils', 'doctest', 'docutils', 'email', 'fractions', 'ftplib', 'getopt', 'getpass', 'gettext', 'gi', 'html', 'http', 'imp', 'jinja', 'jinja2', 'markupsafe', 'matplotlib', 'mimetypes', 'netrc', 'nturl2path', 'packaging', 'pandas', 'pdb', 'pkg_resources', 'pprint', 'py_compile', 'pydoc', 'pydoc_data', 'pygments', 'pytest', 'pytz', 'pywin32', 'pywin32_system32', 'quopri', 'runpy', 'setuptools', 'six', 'socketserver', 'sphinx', 'ssl', 'statistics', 'stringprep', 'struct', 'sysconfig', 'tarfile', 'tcl', 'threadpoolctl', 'tkinter', 'tomli', 'tornado', 'tracemalloc', 'tty', 'tzdata', 'unittest', 'win32', 'win32com', 'xml', 'xmlrpc', 'yaml', 'zipp'],
+	excludes=['IPython', 'PIL', 'PyQt5.uic', 'PyQt6', 'Pythonwin', 'abc', 'alabaster', 'asyncio', 'babel', 'bdb', 'calendar', 'certifi', 'cffi', 'charset_normalizer', 'cmd', 'code', 'codeop', 'contourpy', 'cryptography', 'csv', 'decimal', 'distutils', 'doctest', 'docutils', 'email', 'fractions', 'ftplib', 'getopt', 'getpass', 'gettext', 'gi', 'html', 'http', 'imp', 'jinja', 'jinja2', 'markupsafe', 'matplotlib', 'mimetypes', 'netrc', 'nturl2path', 'packaging', 'pandas', 'pdb', 'pkg_resources', 'pprint', 'py_compile', 'pydoc', 'pydoc_data', 'pygments', 'pytest', 'pytz', 'pywin32', 'pywin32_system32', 'quopri', 'runpy', 'setuptools', 'six', 'socketserver', 'sphinx', 'ssl', 'statistics', 'stringprep', 'struct', 'tarfile', 'tcl', 'threadpoolctl', 'tkinter', 'tomli', 'tornado', 'tracemalloc', 'tty', 'tzdata', 'unittest', 'win32', 'win32com', 'xml', 'xmlrpc', 'yaml', 'zipp'],
 	# Critical modules must not be excluded: ['multiprocessing', 'typing_extensions', 'difflib', 'pickle', 'heapq']
 	# Required by tifffile: ['concurrent', 'queue']
+	# Required on Ubuntu: ['sysconfig']
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
