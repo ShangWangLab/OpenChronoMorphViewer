@@ -56,6 +56,7 @@ from main.viewframe import ViewFrame
 from main.volumeimage import (
     ImageBounds,
     VolumeImage,
+    MAX_CHANNELS,
 )
 from sceneitems.camera import Camera
 from sceneitems.clippingplane import ClippingPlane
@@ -73,8 +74,6 @@ logger = logging.getLogger(__name__)
 # VTK can support up to this many clipping planes active at once.
 # This is a fundamental limit imposed by OpenGL.
 MAX_ACTIVE_PLANES: int = 6
-# VTK can support up to this many unique image channels.
-MAX_CHANNELS: int = 4
 
 
 def tree_apply(tree: list[Any], func: Callable[[Any], None]) -> None:
@@ -240,7 +239,7 @@ class Scene:
         if v is None:
             logger.debug("Cannot adjust channels because there is no volume.")
             return
-        for i_chan in range(v.n_channels()):
+        for i_chan in range(min(v.n_channels(), MAX_CHANNELS)):
             chan: ImageChannel = self.image_channels[i_chan]
             chan.from_histogram(v.histogram(i_chan))
             if not chan.exists:

@@ -50,6 +50,10 @@ from main.errorreporter import FileError
 logger = logging.getLogger(__name__)
 
 
+# VTK can support up to this many unique image channels.
+MAX_CHANNELS: int = 4
+
+
 class ImageBounds(NamedTuple):
     x_min: float
     x_max: float
@@ -194,6 +198,9 @@ class VolumeImage:
                 return FileError("TIFF scale is invalid.", self.path)
             if not np.all(np.isfinite(self.origin)):
                 return FileError("TIFF origin is invalid.", self.path)
+            if self.dims[0] > MAX_CHANNELS:
+                return FileError(f"{self.dims[0]}-channel images are not supported ({MAX_CHANNELS} max)",
+                                 self.path)
 
             # TODO: This is a cheap trick to make the TIFF reader work. Refactor this.
             self.header = {}
@@ -248,8 +255,9 @@ class VolumeImage:
             if self.dims.size == 3:
                 self.dims = np.concatenate((np.ones(1, np.int_), self.dims), axis=0)
             n_channels = self.dims[0]
-            if n_channels > 4:
-                return FileError(f"{n_channels}-channel images are not supported (4 max)", self.path)
+            if n_channels > MAX_CHANNELS:
+                return FileError(f"{n_channels}-channel images are not supported ({MAX_CHANNELS} max)",
+                                 self.path)
             if "space directions" in header:
                 # XYZ voxel dimensions in microns.
                 directions: npt.NDArray[np.float64] = header["space directions"]
@@ -425,7 +433,7 @@ class VolumeImage:
             self.image += 128
         # TIFF files often list the channels as separate images. VTK requires them interspersed.
         if self.transpose_ZCYX:
-            self.image = self.image.reshape((self.dims[3], self.dims[0], self.dims[1], self.dims[2]))
+            self.image = self.image.reshape((self.dims[3], self.dims[0], self.dims[2], self.dims[1]))
             # Transpose returns a view into the original array; copy to make it real.
             self.image = self.image.transpose((0, 2, 3, 1)).copy()
         else:
