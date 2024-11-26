@@ -491,8 +491,10 @@ class VolumeMaskTPS:
         logger.info(f"Rebuilding the spline grid for axis {axis}...")
         a0, a1 = _make_grid_axes(i_lower, i_upper, i_dims)
         dep_var = _make_dep_var(a0, a1, parameters, i_ctrl)
+        # The +1 accounts for inclusivity of the slicing bounds,
+        # while the +0.5 accounts for rounding down, for 1.5 total.
         dep_indices = np.clip(
-            ((dep_var - a_offset) / a_scale).astype(np.int_),
+            ((dep_var - a_offset) / a_scale + 1.5).astype(np.int_),
             0, a_dim
         )
 

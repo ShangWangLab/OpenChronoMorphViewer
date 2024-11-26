@@ -152,7 +152,7 @@
      <item>
       <widget class="QLabel" name="label_upscale">
        <property name="text">
-        <string>Up-scale</string>
+        <string>Sampling factor</string>
        </property>
       </widget>
      </item>
@@ -165,7 +165,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Values &gt;1 speed up mask generation at the cost of lower resolution.</string>
+        <string>Values &gt;1 speed up mask generation at the cost of lower mask resolution.</string>
        </property>
        <property name="text">
         <string>1</string>
