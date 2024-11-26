@@ -99,7 +99,9 @@ class Camera(SceneItem):
         self.edit_filter_to: Optional[EditDoneEventFilter] = None
         self.edit_filter_roll: Optional[EditDoneEventFilter] = None
         self.linear_interp: bool = True
-        view_frame.v_prop.SetInterpolationType(int(self.linear_interp))
+        self.jitter: bool = True
+        self.update_interp(view_frame)
+        self.update_jitter(view_frame)
 
     def make_settings_widget(self) -> QWidget:
         """Create a widget to fill the scene settings field."""
@@ -147,6 +149,11 @@ class Camera(SceneItem):
         else:
             # Perspective.
             self.ui_settings.select_projection.setCurrentIndex(1)
+
+        # state = Qt.Checked if self.jitter else Qt.Unchecked  # type: ignore
+        # self.ui_settings.checkbox_jitter.setCheckState(state)
+        state = Qt.Checked if self.linear_interp else Qt.Unchecked  # type: ignore
+        self.ui_settings.checkbox_interpolate.setCheckState(state)
 
     def bind_event_listeners(self, view_frame: ViewFrame) -> None:
         """Creates and attaches an event handler to all the settings.
@@ -242,6 +249,13 @@ class Camera(SceneItem):
 
         self.ui_settings.checkbox_interpolate.stateChanged.connect(toggle_interp)
 
+        def toggle_jitter(state: Qt.CheckState) -> None:
+            self.jitter = state == Qt.Checked  # type: ignore
+            self.update_jitter(view_frame)
+            view_frame.vtk_render()
+
+        self.ui_settings.checkbox_jitter.stateChanged.connect(toggle_jitter)
+
     def update_interp(self, view_frame: ViewFrame) -> None:
         """Set the VTK interpolation type based on the internal value "linear_interp".
 
@@ -249,6 +263,14 @@ class Camera(SceneItem):
         """
 
         view_frame.v_prop.SetInterpolationType(int(self.linear_interp))
+
+    def update_jitter(self, view_frame: ViewFrame) -> None:
+        """Set the VTK ray cast jitter based on the internal value "jitter".
+
+        Must call this after "from_struct" to pass the view frame.
+        """
+
+        view_frame.v_mapper.SetUseJittering(int(self.jitter))
 
     def _view_from_func(self,
                         orientation: Vec3,
@@ -302,6 +324,7 @@ class Camera(SceneItem):
         struct["scale"] = self.camera.GetParallelScale()
         struct["orthographic"] = bool(self.camera.GetParallelProjection())
         struct["linear_interpolation"] = self.linear_interp
+        struct["ray_cast_jitter"] = self.jitter
         return struct
 
     def from_struct(self, struct: dict[str, Any]) -> list[str]:
@@ -328,6 +351,7 @@ class Camera(SceneItem):
         scale = load_float("scale", struct, errors, min_=0.1)
         orthographic = load_bool("orthographic", struct, errors)
         linear_interp = load_bool("linear_interpolation", struct, errors)
+        jitter = load_bool("ray_cast_jitter", struct, errors)
 
         if len(errors) > 0:
             return errors
@@ -343,4 +367,5 @@ class Camera(SceneItem):
         self.camera.SetParallelScale(scale)
         self.camera.SetParallelProjection(orthographic)
         self.linear_interp = linear_interp
+        self.jitter = jitter
         return []

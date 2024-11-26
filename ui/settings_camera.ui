@@ -495,7 +495,20 @@
    <item>
     <widget class="QCheckBox" name="checkbox_interpolate">
      <property name="text">
-      <string>Linear Interpolation</string>
+      <string>Linear interpolation</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkbox_jitter">
+     <property name="toolTip">
+      <string>Add a small random offset to the ray sampling to reduce aliasing and band patterns.</string>
+     </property>
+     <property name="text">
+      <string>Sample jitter</string>
      </property>
      <property name="checked">
       <bool>true</bool>

@@ -571,6 +571,7 @@ you'll have no way to get another!")
                     errors.extend(err)
                 else:
                     self.camera.update_interp(self.view_frame)
+                    self.camera.update_jitter(self.view_frame)
             elif t == "ScaleBar":
                 err = self.scale_bar.from_struct(item_struct)
                 if err:
