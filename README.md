@@ -9,11 +9,11 @@ yet intuitive smooth clipping function based on thin-plate splines for
 easily and aesthetically tracking morphology as it changes over time.
 
 Note: This software is designed for a large number of 
-medium-sized volumes, around 1 GB or less each—it is **not suitable
-for very large volumes!** Each volume must be small enough to fit
+medium-sized volumes, with each volume being around 1 GB or less—it is **not suitable
+for an individual volume that is very large!** Each volume must be small enough to fit
 inside your total GPU memory! For example, if you have 8 GB of dedicated
 GPU memory and 16 GB of shared GPU memory, then you can, in principle,
-open volumes up to 24 GB. In practice, you would then be unable to use
+open an individual volume up to 24 GB. In practice, you would then be unable to use
 the clipping spline at full resolution because the mask also utilizes
 some of your GPU memory.
 
@@ -86,4 +86,4 @@ questions or comments.
 Funded by the National Institutes of Health (R35GM142953).
 
 A special thanks to our colleagues at
-[Dr. Shang Wang's Biophotonic's Lab](https://www.shangwanglab.org/team)!
+[Dr. Shang Wang's Lab](https://www.shangwanglab.org/team)!
