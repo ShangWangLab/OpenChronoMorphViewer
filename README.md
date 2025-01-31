@@ -9,18 +9,33 @@ yet intuitive smooth clipping function based on thin-plate splines for
 easily and aesthetically tracking morphology as it changes over time.
 
 Note: This software is designed for a large number of 
-medium-sized volumes, with each volume being around 1 GB or less—it is **not suitable
-for an individual volume that is very large!** Each volume must be small enough to fit
-inside your total GPU memory! For example, if you have 8 GB of dedicated
+medium-sized volumes, with each volume being around 1 GB or less—it is
+**not suitable for a very large individual volume!** Each volume must be 
+small enough to fit
+inside your total GPU memory; for example, if you have 8 GB of dedicated
 GPU memory and 16 GB of shared GPU memory, then you can, in principle,
-open an individual volume up to 24 GB. In practice, you would then be unable to use
-the clipping spline at full resolution because the mask also utilizes
+open an individual volume up to 24 GB. In practice, you would then be unable to
+use the clipping spline at full resolution because the mask also utilizes
 some of your GPU memory.
+
+This software is under active development. If you notice any errors or 
+abnormalities, we would greatly appreciate it if you went to the "Issues"
+tab on this page and documented the issue so we can address it.
 
 ## Installation instructions
 For Windows, Ubuntu, and macOS.
 
 [Read here](documentation/install/installation-instructions.md)
+
+## Tutorials & demonstrations
+
+Some demonstration tutorials are available on YouTube showcasing several 
+aspects:
+
+1. [The two-axis timeline](https://youtu.be/ZUTMIbecfRU)
+2. [The clipping spline](https://youtu.be/PlSisrJjMvc)
+3. [Saving and loading scene files](https://youtu.be/SiHReuKi4po)
+4. [Example animations using the Python API](https://youtu.be/HkJPfJoB_q4)
 
 ## Supported file formats
 
@@ -53,7 +68,7 @@ videos and supplementary materials:
 
 > Andre C. Faubert and Shang Wang, "Open Chrono-Morph viewer: visualize big
 bioimage time series containing heterogeneous volumes,"
-_Bioinformatics_, 15 Jan. 2025,
+_Bioinformatics_, 41(1), 15 Jan. 2025,
 [doi:10.1093/bioinformatics/btae761](https://doi.org/10.1093/bioinformatics/btae761)
 
 Please use this citation if you use the clipping spline feature for any 
@@ -62,12 +77,13 @@ clipping spline and some examples of its use for cardiac timeseries:
 
 > Andre C. Faubert and Shang Wang, "Clipping spline: interactive, dynamic
 4D volume clipping and analysis based on thin plate spline,"
-_Biomedical Optics Express_, vol. 16, no. 2, 8 Jan. 2025, pp. 499–519,
+_Biomedical Optics Express_, 16(2), 499–519, 8 Jan. 2025,
 [doi:10.1364/BOE.544231](https://doi.org/10.1364/BOE.544231)
 
 ## Test dataset
 
-A test dataset for OCMV is available on [Zenodo](https://doi.org/10.5281/zenodo.13712866).
+A test dataset for OCMV is available on
+[Zenodo](https://doi.org/10.5281/zenodo.13712866).
 
 ## License
 
