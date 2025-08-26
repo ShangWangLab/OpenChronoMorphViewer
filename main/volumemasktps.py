@@ -435,8 +435,8 @@ class VolumeMaskTPS:
 
         prop = vtkProperty()
         prop.SetRepresentationToWireframe()
-        prop.SetColor(1, 1, 0)  # Yellow
-        prop.SetLineWidth(2)
+        prop.SetColor(1, 1, 0.3)  # Yellow
+        prop.SetLineWidth(1.5)
 
         actor = vtkActor()
         actor.SetMapper(mapper)
