@@ -494,9 +494,9 @@ class VolumeMaskTPS:
         # The +1 accounts for inclusivity of the slicing bounds,
         # while the +0.5 accounts for rounding down, for 1.5 total.
         dep_indices = np.clip(
-            ((dep_var - a_offset) / a_scale + 1.5).astype(np.int_),
+            (dep_var - a_offset) / a_scale + 1.5,
             0, a_dim
-        )
+        ).astype(np.int_)
 
         if self.keep_greater_than:  # Only accessed once; is thread safe.
             fill_below = np.uint8(0)  # Transparent
