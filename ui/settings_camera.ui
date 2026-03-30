@@ -516,6 +516,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkbox_shading">
+     <property name="toolTip">
+      <string>Shade volumes as if they were solid shells, with automatic boundary detection.</string>
+     </property>
+     <property name="text">
+      <string>Solid shading</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="checkbox_save_keyframes">
      <property name="text">
       <string>Save to keyframes</string>

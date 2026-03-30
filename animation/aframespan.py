@@ -63,6 +63,11 @@ class AFrameSpan:
             a_frames.extend(self.copy().a_frames)
         return AFrameSpan(a_frames)
 
+    def __rmul__(self, n: int) -> "AFrameSpan":
+        """Right-multiply is the same as left-multiply."""
+
+        return self * n
+
     def __getitem__(self, item: int or slice) -> "AFrameSpan" or AFrame:
         """Index into the underlying animation frame list."""
 
@@ -155,7 +160,15 @@ class AFrameSpan:
             camera = vtkCamera()
             camera.SetParallelProjection(orthographic_mode)
             model.InterpolateCamera(t, camera)
-            frame.scene.items["Camera"] = vtk_camera_to_struct(camera)
+            camera_struct = vtk_camera_to_struct(camera)
+            ref_cam = keyframes[0].items["Camera"]
+            if "linear_interpolation" in ref_cam:
+                camera_struct["linear_interpolation"] = ref_cam["linear_interpolation"]
+            if "ray_cast_jitter" in ref_cam:
+                camera_struct["ray_cast_jitter"] = ref_cam["ray_cast_jitter"]
+            if "shading" in ref_cam:
+                camera_struct["shading"] = ref_cam["shading"]
+            frame.scene.items["Camera"] = camera_struct
 
     def interpolate_channels_1d(
             self,

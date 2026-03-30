@@ -147,6 +147,8 @@ class AMainScene:
                     errors.extend(err)
                 else:
                     self.camera.update_interp(self.view_frame)
+                    self.camera.update_jitter(self.view_frame)
+                    self.camera.update_shading(self.view_frame)
                     self.scale_bar.update_visibility()
             elif t == "ScaleBar":
                 err = self.scale_bar.from_struct(item_struct)

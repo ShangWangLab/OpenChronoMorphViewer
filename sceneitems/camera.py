@@ -100,8 +100,10 @@ class Camera(SceneItem):
         self.edit_filter_roll: Optional[EditDoneEventFilter] = None
         self.linear_interp: bool = True
         self.jitter: bool = True
+        self.shading: bool = False
         self.update_interp(view_frame)
         self.update_jitter(view_frame)
+        self.update_shading(view_frame)
 
     def make_settings_widget(self) -> QWidget:
         """Create a widget to fill the scene settings field."""
@@ -150,10 +152,12 @@ class Camera(SceneItem):
             # Perspective.
             self.ui_settings.select_projection.setCurrentIndex(1)
 
-        # state = Qt.Checked if self.jitter else Qt.Unchecked  # type: ignore
-        # self.ui_settings.checkbox_jitter.setCheckState(state)
-        state = Qt.Checked if self.linear_interp else Qt.Unchecked  # type: ignore
-        self.ui_settings.checkbox_interpolate.setCheckState(state)
+        self.ui_settings.checkbox_jitter.setCheckState(
+            Qt.Checked if self.jitter else Qt.Unchecked)
+        self.ui_settings.checkbox_interpolate.setCheckState(
+            Qt.Checked if self.linear_interp else Qt.Unchecked)
+        self.ui_settings.checkbox_shading.setCheckState(
+            Qt.Checked if self.shading else Qt.Unchecked)
 
     def bind_event_listeners(self, view_frame: ViewFrame) -> None:
         """Creates and attaches an event handler to all the settings.
@@ -256,6 +260,13 @@ class Camera(SceneItem):
 
         self.ui_settings.checkbox_jitter.stateChanged.connect(toggle_jitter)
 
+        def toggle_shading(state: Qt.CheckState) -> None:
+            self.shading = state == Qt.Checked  # type: ignore
+            self.update_shading(view_frame)
+            view_frame.vtk_render()
+
+        self.ui_settings.checkbox_shading.stateChanged.connect(toggle_shading)
+
     def update_interp(self, view_frame: ViewFrame) -> None:
         """Set the VTK interpolation type based on the internal value "linear_interp".
 
@@ -271,6 +282,14 @@ class Camera(SceneItem):
         """
 
         view_frame.v_mapper.SetUseJittering(int(self.jitter))
+
+    def update_shading(self, view_frame: ViewFrame) -> None:
+        """Set VTK shading on or off based on the internal value "shading".
+
+        Must call this after "from_struct" to pass the view frame.
+        """
+
+        view_frame.v_prop.SetShade(int(self.shading))
 
     def _view_from_func(self,
                         orientation: Vec3,
@@ -325,6 +344,7 @@ class Camera(SceneItem):
         struct["orthographic"] = bool(self.camera.GetParallelProjection())
         struct["linear_interpolation"] = self.linear_interp
         struct["ray_cast_jitter"] = self.jitter
+        struct["shading"] = self.shading
         return struct
 
     def from_struct(self, struct: dict[str, Any]) -> list[str]:
@@ -351,7 +371,13 @@ class Camera(SceneItem):
         scale = load_float("scale", struct, errors, min_=0.1)
         orthographic = load_bool("orthographic", struct, errors)
         linear_interp = load_bool("linear_interpolation", struct, errors)
-        jitter = load_bool("ray_cast_jitter", struct, errors)
+        jitter = load_bool("ray_cast_jitter", struct, [])
+        shading = load_bool("shading", struct, [])
+        # For compatibility with previous releases, missing ray cast jitter or shading is not an error.
+        if jitter is None:
+            jitter = True
+        if shading is None:
+            shading = False
 
         if len(errors) > 0:
             return errors
@@ -368,4 +394,5 @@ class Camera(SceneItem):
         self.camera.SetParallelProjection(orthographic)
         self.linear_interp = linear_interp
         self.jitter = jitter
+        self.shading = shading
         return []

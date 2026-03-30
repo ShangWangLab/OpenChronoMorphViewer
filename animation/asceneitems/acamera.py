@@ -60,7 +60,11 @@ class ACamera(ASceneItem):
         self.camera.Elevation(10)
 
         self.linear_interp: bool = True
-        view_frame.v_prop.SetInterpolationType(int(self.linear_interp))
+        self.jitter: bool = True
+        self.shading: bool = False
+        self.update_interp(view_frame)
+        self.update_jitter(view_frame)
+        self.update_shading(view_frame)
 
     def update_interp(self, view_frame: AView) -> None:
         """Set the VTK interpolation type based on the internal value "linear_interp".
@@ -69,6 +73,22 @@ class ACamera(ASceneItem):
         """
 
         view_frame.v_prop.SetInterpolationType(int(self.linear_interp))
+
+    def update_jitter(self, view_frame: AView) -> None:
+        """Set the VTK ray cast jitter based on the internal value "jitter".
+
+        Must call this after "from_struct" to pass the view frame.
+        """
+
+        view_frame.v_mapper.SetUseJittering(int(self.jitter))
+
+    def update_shading(self, view_frame: AView) -> None:
+        """Set VTK shading on or off based on the internal value "shading".
+
+        Must call this after "from_struct" to pass the view frame.
+        """
+
+        view_frame.v_prop.SetShade(int(self.shading))
 
     def from_struct(self, struct: dict[str, Any]) -> list[str]:
         """Set values based on the data given in struct.
@@ -79,13 +99,20 @@ class ACamera(ASceneItem):
         """
 
         errors: list[str] = super().from_struct(struct)
-        linear_interp = load_bool("linear_interpolation", struct, errors)
+        linear_interp = load_bool("linear_interpolation", struct, [])
+        jitter = load_bool("ray_cast_jitter", struct, [])
+        shading = load_bool("shading", struct, [])
         vtk_camera_from_struct(self.camera, struct, errors)
 
         if len(errors) > 0:
             return errors
 
-        self.linear_interp = linear_interp
+        if linear_interp is not None:
+            self.linear_interp = linear_interp
+        if jitter is not None:
+            self.jitter = jitter
+        if shading is not None:
+            self.shading = shading
         return []
 
 
@@ -130,5 +157,4 @@ def vtk_camera_to_struct(camera: vtkCamera) -> dict[str, Any]:
         "view_up": list(camera.GetViewUp()),
         "scale": camera.GetParallelScale(),
         "orthographic": bool(camera.GetParallelProjection()),
-        "linear_interpolation": True
     }
