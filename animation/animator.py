@@ -72,7 +72,7 @@ class Animator:
         volumes/sec, otherwise it is relative to the period specified by the
         volumes themselves. For example, if the volume rate is 0.3, then the
         resulting video will play at 30% of real-time, assuming the period
-        specified by the volumes is accurate.
+        specified by the volumes is accurately specified in seconds.
 
         "absolute_rate" as True may behave unstably when both:
         1. The acquisition period varies, and

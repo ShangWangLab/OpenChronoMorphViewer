@@ -270,7 +270,7 @@ class Scene:
         if old_widget is not None:
             old_widget.destroy()
         else:
-            logger.debug("The scene scroller lost its widget somehow!")
+            logger.warning("The scene scroller lost its widget somehow!")
 
         # No race condition; this runs on the UI thread.
         for i in range(self.ui.scene_list.count()):
@@ -572,6 +572,7 @@ you'll have no way to get another!")
                 else:
                     self.camera.update_interp(self.view_frame)
                     self.camera.update_jitter(self.view_frame)
+                    self.camera.update_shading(self.view_frame)
             elif t == "ScaleBar":
                 err = self.scale_bar.from_struct(item_struct)
                 if err:
