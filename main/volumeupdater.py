@@ -29,6 +29,7 @@
 
 import logging
 from threading import (
+    Event,
     Lock,
     Thread,
 )
@@ -65,6 +66,8 @@ class VolumeUpdater:
         # when there is no living thread to carry out the request indicated.
         self.load_lock = Lock()
         self.must_update: bool = False
+        # Used to synchronize the AutoPlayer.
+        self.auto_player_can_continue: Event = Event()
         logger.debug("Initialized.")
 
     def queue(self) -> None:
@@ -149,9 +152,5 @@ class VolumeUpdater:
             self.load_lock.release()
         except RuntimeError as e:
             logger.exception(f"Thread error: {e}")
-
-    def wait_for_volume_update(self) -> None:
-        """Blocks until the volume update queue is empty."""
-
-        if self.thread is not None:
-            self.thread.join()
+        # Let the Auto Player know that a render has completed.
+        self.auto_player_can_continue.set()

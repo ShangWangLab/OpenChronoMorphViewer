@@ -80,8 +80,9 @@ class AutoPlayer:
                 last_update_time = time.time()
 
                 logger.debug("Timeline slider +1...")
-                self.timeline_slider.add(1)
-                self.volume_updater.wait_for_volume_update()
+                self.volume_updater.auto_player_can_continue.clear()
+                self.timeline_slider.plz_add.emit(1)
+                self.volume_updater.auto_player_can_continue.wait()
 
                 update_delta_time = time.time() - last_update_time
                 if self.fps <= 0:

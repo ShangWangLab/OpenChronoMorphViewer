@@ -43,6 +43,11 @@
 import logging
 from typing import Any, Optional
 
+from PyQt5.QtCore import (
+    pyqtSlot,
+    pyqtSignal, QObject,
+)
+
 from main.autoplayer import AutoPlayer
 from main.eventfilter import EditDoneEventFilter
 from main.timeline import Timeline
@@ -56,13 +61,20 @@ from ui.main_window import Ui_MainWindow
 logger = logging.getLogger(__name__)
 
 
-class TimelineSlider:
-    """Manages the UI related to the timeline slider and associated buttons."""
+class TimelineSlider(QObject):
+    """Manages the UI related to the timeline slider and associated buttons.
+
+    These functions are unsafe to call from another thread. Use Qt signals and
+    slots if needed.
+    """
+
+    plz_add = pyqtSignal(int)
 
     def __init__(self,
                  ui: Ui_MainWindow,
                  volume_updater: VolumeUpdater,
                  timeline: Timeline) -> None:
+        super().__init__()
         self.ui = ui
         self.volume_updater = volume_updater
         self.timeline = timeline
@@ -71,6 +83,7 @@ class TimelineSlider:
         self.edit_cycles_filter: Optional[EditDoneEventFilter] = None
         self.n_cycles: int = 1
         self.cycles_remaining: int = self.n_cycles
+        self.plz_add.connect(self.add)  # type: ignore
         self.reset()
 
     def reset(self) -> None:
@@ -225,6 +238,7 @@ class TimelineSlider:
         self._update_label()
         self.volume_updater.queue()
 
+    @pyqtSlot(int)
     def add(self, delta: int) -> None:
         """Add delta to the slider index with wrap-around.
 
